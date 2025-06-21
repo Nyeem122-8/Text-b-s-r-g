@@ -251,7 +251,7 @@
             var countB = matchedNumbers.filter(num => num >= 5 && num <= 9).length;
             var countS = matchedNumbers.filter(num => num >= 0 && num <= 4).length;
 
-            document.getElementById("result-box").innerText = countB > countS ? "BIG" : countS > countB ? "SMALL" : "??";
+            document.getElementById("result-box").innerText = countB > countS ? "SMALL" : countS > countB ? "BIG" : "??";
         }
 
         // User Panel Script
