@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Pattern Prediction System</title>
+    <title>Quantum Pattern Prediction</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
@@ -449,56 +449,79 @@
             100% { transform: translateY(0) rotate(360deg); }
         }
 
-        /* BS Grid Layout */
-        .bs-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
+        /* Data table styles */
+        .data-table {
             width: 100%;
-            max-width: 200px;
-            margin: 1rem auto;
-        }
-
-        .bs-item {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            padding: 0.5rem;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: rgba(30, 30, 30, 0.7);
             border-radius: 8px;
-            background-color: rgba(30, 30, 30, 0.5);
-            border: 1px solid var(--card-border);
-            transition: var(--transition);
-            cursor: pointer;
-            height: 40px;
+            overflow: hidden;
         }
 
-        .bs-item.b {
-            color: var(--big-color);
-            border-color: var(--big-color);
-        }
-
-        .bs-item.s {
-            color: var(--small-color);
-            border-color: var(--small-color);
-        }
-
-        .bs-item.b.active {
-            background-color: var(--big-color);
+        .data-table th {
+            background-color: var(--primary);
             color: #000;
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.5), 0 0 15px rgba(76, 175, 80, 0.4);
+            font-family: 'Orbitron', sans-serif;
+            padding: 0.75rem;
+            text-align: center;
         }
 
-        .bs-item.s.active {
-            background-color: var(--small-color);
-            color: #000;
-            box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.5), 0 0 15px rgba(244, 67, 54, 0.4);
+        .data-table td {
+            padding: 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid var(--card-border);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 500;
         }
 
-        /* User Panel Styles */
-        .user-panel {
+        .data-table tr:hover {
+            background-color: rgba(106, 90, 205, 0.1);
+        }
+
+        .data-table .latest {
+            background-color: rgba(76, 175, 80, 0.2);
+        }
+
+        /* Timer styles */
+        .round-timer {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            text-align: center;
+            margin: 1rem 0;
+            color: var(--primary-light);
+            text-shadow: 0 0 10px rgba(106, 90, 205, 0.7);
+        }
+
+        /* Loading animation */
+        .loading-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(106, 90, 205, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-light);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* User panel styles */
+        .user-panel-container {
             background: var(--panel-bg);
             border-radius: 16px;
             padding: 2rem;
@@ -510,7 +533,7 @@
             z-index: 1;
         }
 
-        .user-panel::before {
+        .user-panel-container::before {
             content: "";
             position: absolute;
             top: 0;
@@ -588,7 +611,7 @@
             color: var(--primary-light);
         }
 
-        #countdown {
+        #userCountdown {
             font-size: 2.2rem;
             font-weight: 700;
             color: var(--big-color);
@@ -714,7 +737,7 @@
                 font-size: 1.5rem;
             }
 
-            #countdown {
+            #countdown, #userCountdown {
                 font-size: 1.8rem;
             }
         }
@@ -744,7 +767,7 @@
                 font-size: 1.3rem;
             }
 
-            #countdown {
+            #countdown, #userCountdown {
                 font-size: 1.5rem;
             }
 
@@ -759,30 +782,44 @@
         <!-- Floating particles -->
         <div id="particles"></div>
         
+        <!-- Loading overlay -->
+        <div class="loading-container" id="loadingContainer">
+            <div class="loading-spinner"></div>
+        </div>
+        
         <header class="header">
-            <h1>Dark hack</h1>
+            <h1>Quantum Pattern Prediction</h1>
         </header>
 
         <div class="main-container">
+            <div class="round-timer" id="roundTimer">Next Round: 00:30</div>
+            
             <div class="result-section">
                 <div class="result-display animate__animated" id="resultDisplay">-</div>
-                <div class="confidence-meter" id="confidenceMeter">Select patterns to analyze</div>
-                <div class="bs-grid" id="bsGrid">
-                    <!-- BS grid will be generated here -->
-                </div>
-                <div class="action-buttons">
-                    <button class="btn-analyze" id="okBtn" style="display: none;">CLEAR</button>
-                    <button class="btn-clear" id="clearBtn" style="display: none;">DKWIN</button>
-                </div>
+                <div class="confidence-meter" id="confidenceMeter">Analyzing patterns...</div>
                 
                 <!-- Pattern Info Section -->
-                <div class="pattern-info" id="patternInfo" style="display: none;">
+                <div class="pattern-info" id="patternInfo">
                     <h3>PATTERN ANALYSIS</h3>
                     <p><strong>Detected Pattern:</strong> <span id="patternName">-</span></p>
                     <p><strong>Pattern Logic:</strong> <span id="patternLogic">-</span></p>
                     <p><strong>Prediction Strategy:</strong> <span id="patternStrategy">-</span></p>
                 </div>
             </div>
+            
+            <!-- Data Table -->
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Number</th>
+                        <th>B/S</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
         </div>
 
         <div class="history-section">
@@ -793,43 +830,46 @@
         </div>
 
         <!-- User Panel Section -->
-        <div class="user-panel">
-            <h2 class="panel-header">USER ACCESS CONTROL</h2>
+        <div class="user-panel-container">
+            <h2 class="panel-header">USER PANEL</h2>
             
             <div class="key-display">
-                <strong>ACCESS KEY:</strong> <span id="displayKey"></span><br>
-                <strong>EXPIRATION:</strong> <span id="displayExpiry"></span>
+                <strong>LAST UPDATE:</strong> <span id="lastUpdate"></span><br>
+                <strong>NEXT PREDICTION:</strong> <span id="nextPrediction"></span>
             </div>
             
             <div class="timer">
-                <p>ACCESS TIME REMAINING</p>
-                <div id="countdown">00d 00h 00m 00s</div>
+                <p>SESSION TIME REMAINING</p>
+                <div id="userCountdown">00:00:00</div>
             </div>
             
-            
+            <button class="btn-logout" onclick="logout()">LOGOUT</button>
         </div>
     </div>
 
     <script>
         // DOM elements
-        const okBtn = document.getElementById('okBtn');
-        const clearBtn = document.getElementById('clearBtn');
         const resultDisplay = document.getElementById('resultDisplay');
         const confidenceMeter = document.getElementById('confidenceMeter');
         const historyGrid = document.getElementById('historyGrid');
         const particlesContainer = document.getElementById('particles');
-        const bsGrid = document.getElementById('bsGrid');
-        const displayKey = document.getElementById('displayKey');
-        const displayExpiry = document.getElementById('displayExpiry');
-        const countdown = document.getElementById('countdown');
+        const lastUpdate = document.getElementById('lastUpdate');
+        const nextPrediction = document.getElementById('nextPrediction');
+        const userCountdown = document.getElementById('userCountdown');
         const patternInfo = document.getElementById('patternInfo');
         const patternName = document.getElementById('patternName');
         const patternLogic = document.getElementById('patternLogic');
         const patternStrategy = document.getElementById('patternStrategy');
+        const dataTableBody = document.getElementById('dataTableBody');
+        const roundTimer = document.getElementById('roundTimer');
+        const loadingContainer = document.getElementById('loadingContainer');
 
         // Game state
         let history = [];
-        let userSelections = Array(6).fill(null);
+        let lastIssueNumber = null;
+        let currentPattern = [];
+        let predictionHistory = [];
+        let sessionExpiry = Date.now() + 86400000; // 24 hours from now
 
         // Create floating particles
         function createParticles() {
@@ -860,95 +900,134 @@
             }
         }
 
-        // Initialize the game
-        function initGame() {
-            // Reset user selections
-            userSelections = Array(6).fill(null);
-
-            // Reset result display
-            resultDisplay.textContent = '-';
-            resultDisplay.className = 'result-display animate__animated';
-            confidenceMeter.textContent = 'Select patterns to analyze';
-            okBtn.style.display = 'none';
-            clearBtn.style.display = 'none';
-            patternInfo.style.display = 'none';
-
-            // Update BS grid
-            updateBSGrid();
-        }
-
-        // Handle selection from BS grid
-        function handleSelection(index, value, element) {
-            // Set active state for clicked item
-            element.classList.add('active');
-            
-            // Add click animation
-            element.classList.add('animate__pulse');
+        // Show loading animation
+        function showLoading() {
+            loadingContainer.style.display = 'flex';
             setTimeout(() => {
-                element.classList.remove('animate__pulse');
-            }, 300);
+                loadingContainer.style.display = 'none';
+            }, 3000); // Show for 3 seconds
+        }
+
+        // Update timer display
+        function updateTimer() {
+            const now = new Date();
+            const base = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 5, 30, 0);
+            if (now < base) base.setDate(base.getDate() - 1);
+            const elapsed = Math.floor((now - base) / 1000);
+            const remain = 30 - (elapsed % 30);
+
+            roundTimer.textContent = `Next Round: 00:${String(remain).padStart(2, '0')}`;
             
-            // Store user selection
-            userSelections[index] = value;
+            if (remain === 30) {
+                showLoading();
+                setTimeout(fetchAndUpdate, 3000); // Fetch after loading completes
+            }
+            setTimeout(updateTimer, 1000);
+        }
+
+        // Update session countdown
+        function updateSessionCountdown() {
+            const now = Date.now();
+            const remaining = sessionExpiry - now;
             
-            // Show clear button when at least one selection is made
-            if (userSelections.some(selection => selection !== null)) {
-                clearBtn.style.display = 'inline-block';
+            if (remaining <= 0) {
+                userCountdown.textContent = "SESSION EXPIRED";
+                userCountdown.style.color = "var(--small-color)";
+                logout();
+                return;
+            }
+            
+            const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((remaining % (1000 * 60)) / 1000);
+            
+            userCountdown.textContent = 
+                `${String(Math.floor(hours)).padStart(2, '0')}:${String(Math.floor(mins)).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            
+            // Change color when less than 1 hour remains
+            if (remaining < 3600000) {
+                userCountdown.style.color = "var(--small-color)";
+                userCountdown.style.textShadow = "0 0 10px rgba(244, 67, 54, 0.5)";
             } else {
-                clearBtn.style.display = 'none';
-            }
-            
-            // Automatically analyze when all patterns are selected
-            if (!userSelections.includes(null)) {
-                analyzePatterns();
+                userCountdown.style.color = "var(--big-color)";
+                userCountdown.style.textShadow = "0 0 10px rgba(76, 175, 80, 0.5)";
             }
         }
 
-        // Update BS grid display
-        function updateBSGrid() {
-            bsGrid.innerHTML = '';
-            
-            // Create 4 rows of B/S items
-            for (let i = 0; i < 6; i++) {
-                const bItem = document.createElement('div');
-                bItem.className = `bs-item b ${userSelections[i] === 'B' ? 'active' : ''}`;
-                bItem.textContent = 'B';
-                bItem.dataset.index = i;
-                bItem.dataset.value = 'B';
-                bItem.addEventListener('click', function() {
-                    handleSelection(parseInt(this.dataset.index), this.dataset.value, this);
+        // Fetch data from API and update display
+        async function fetchAndUpdate() {
+            try {
+                const res = await fetch('https://crbbb.com/api/webapi/GetNoaverageEmerdList', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+                    body: JSON.stringify({
+                        pageSize: 10,
+                        pageNo: 1,
+                        typeId: 30,
+                        language: 0,
+                        random: "62d02162c2234c64b57aa4188c5810b2",
+                        signature: "9BF7A245709AA054E231D75C404C6527",
+                        timestamp: Math.floor(Date.now() / 1000)
+                    })
                 });
-                bsGrid.appendChild(bItem);
+
+                const json = await res.json();
+                const list = json?.data?.list;
+                if (!list?.length) return;
+
+                const latest = list[0];
+                const currentIssue = latest.issueNumber;
+
+                if (currentIssue !== lastIssueNumber) {
+                    lastIssueNumber = currentIssue;
+                    renderTable(list);
+                    analyzeResults(list);
+                }
+
+                // Update last update time
+                lastUpdate.textContent = new Date().toLocaleTimeString();
+            } catch (error) {
+                console.error("Fetch error:", error);
+            }
+        }
+
+        // Render data table
+        function renderTable(data) {
+            dataTableBody.innerHTML = '';
+            
+            // Update current pattern with latest data
+            currentPattern = data.map(item => {
+                const number = Number(item.number);
+                return number <= 4 ? 'S' : 'B';
+            }).slice(0, 6).reverse(); // Get last 6 results
+            
+            data.forEach((item, index) => {
+                const number = Number(item.number);
+                const bs = number <= 4 ? 'S' : 'B';
+                const isLatest = index === 0 ? 'latest' : '';
                 
-                const sItem = document.createElement('div');
-                sItem.className = `bs-item s ${userSelections[i] === 'S' ? 'active' : ''}`;
-                sItem.textContent = 'S';
-                sItem.dataset.index = i;
-                sItem.dataset.value = 'S';
-                sItem.addEventListener('click', function() {
-                    handleSelection(parseInt(this.dataset.index), this.dataset.value, this);
-                });
-                bsGrid.appendChild(sItem);
-            }
+                const row = document.createElement('tr');
+                if (isLatest) row.classList.add('latest');
+                
+                row.innerHTML = `
+                    <td>${item.issueNumber.slice(-4)}</td>
+                    <td>${number}</td>
+                    <td>${bs}</td>
+                `;
+                
+                dataTableBody.appendChild(row);
+            });
         }
 
-        // Clear all selections
-        function clearSelections() {
-            userSelections = Array(6).fill(null);
-            resultDisplay.textContent = '-';
-            resultDisplay.className = 'result-display animate__animated';
-            confidenceMeter.textContent = 'Select patterns to analyze';
-            clearBtn.style.display = 'none';
-            patternInfo.style.display = 'none';
+        // Analyze results and make prediction
+        function analyzeResults(data) {
+            const results = data.map(item => {
+                const number = Number(item.number);
+                return number <= 4 ? 'S' : 'B';
+            }).slice(0, 6); // Get last 6 results
             
-            // Update BS grid
-            updateBSGrid();
-        }
-
-        // Analyze patterns and make prediction
-        function analyzePatterns() {
             // Get the pattern as string (e.g. "BSBS")
-            const pattern = userSelections.join('');
+            const pattern = results.join('');
             
             // Advanced pattern detection
             let nextPred;
@@ -1240,8 +1319,8 @@
             }
             // Default prediction based on majority
             else {
-                const bCount = userSelections.filter(s => s === 'B').length;
-                const sCount = userSelections.filter(s => s === 'S').length;
+                const bCount = results.filter(s => s === 'B').length;
+                const sCount = results.filter(s => s === 'S').length;
                 nextPred = bCount > sCount ? 'S' : 'B';
                 confidence = 80 + Math.floor(Math.random() * 15);
                 patternDetected = "Advanced Analysis";
@@ -1249,8 +1328,11 @@
                 strategy = "Opposite of majority due to probability balancing";
             }
 
-            // Add to history
-            history.push(nextPred);
+            // Add to prediction history
+            predictionHistory.push(nextPred);
+            if (predictionHistory.length > 10) {
+                predictionHistory.shift();
+            }
 
             // Display result with animation
             const displayText = nextPred === 'B' ? 'BIG' : 'SMALL';
@@ -1262,22 +1344,28 @@
             patternName.textContent = patternDetected;
             patternLogic.textContent = patternDescription;
             patternStrategy.textContent = strategy;
-            patternInfo.style.display = 'block';
+
+            // Update next prediction display
+            nextPrediction.textContent = displayText;
 
             // Update history display
             updateHistory();
-            
-            // Disable BS grid items
-            document.querySelectorAll('.bs-item').forEach(item => {
-                item.style.pointerEvents = 'none';
-            });
-            
-            // Show OK button to continue
-            okBtn.style.display = 'inline-block';
-            clearBtn.style.display = 'none';
         }
 
-        // Pattern detection functions
+        // Update history display
+        function updateHistory() {
+            historyGrid.innerHTML = '';
+            predictionHistory.forEach((item, index) => {
+                const historyItem = document.createElement('div');
+                const displayText = item === 'B' ? 'B' : 'S';
+                historyItem.className = `history-item animate__animated animate__zoomIn ${item === 'B' ? 'history-big' : 'history-small'}`;
+                historyItem.style.animationDelay = `${index * 0.1}s`;
+                historyItem.textContent = displayText;
+                historyGrid.appendChild(historyItem);
+            });
+        }
+
+        // Pattern detection functions (same as before)
         function isZigZag(pattern) {
             for (let i = 1; i < pattern.length; i++) {
                 if (pattern[i] === pattern[i-1]) return false;
@@ -1407,8 +1495,7 @@
         }
 
         function isRandomBreak(pattern) {
-            // This is a fallback pattern when no others match
-            return false; // We'll handle this case separately in the analyzePatterns function
+            return false;
         }
 
         function isColorLoop(pattern) {
@@ -1456,7 +1543,6 @@
         }
 
         function isTimeJump(pattern) {
-            // This is a special case we'll handle in analyzePatterns
             return false;
         }
 
@@ -1465,110 +1551,24 @@
         }
 
         function isFourSet(pattern) {
-            return true; // All 4-element patterns are technically four sets
+            return true;
         }
 
-        // Update history display
-        function updateHistory() {
-            historyGrid.innerHTML = '';
-            history.forEach((item, index) => {
-                const historyItem = document.createElement('div');
-                const displayText = item === 'B' ? 'B' : 'S';
-                historyItem.className = `history-item animate__animated animate__zoomIn ${item === 'B' ? 'history-big' : 'history-small'}`;
-                historyItem.style.animationDelay = `${index * 0.1}s`;
-                historyItem.textContent = displayText;
-                historyGrid.appendChild(historyItem);
-            });
-            
-            // Scroll history to the end
-            historyGrid.scrollLeft = historyGrid.scrollWidth;
-        }
-
-        // Initialize user panel
-        function initUserPanel() {
-            // Check login
-            const accessKey = localStorage.getItem('accessKey') || "QK-"+Math.random().toString(36).substr(2, 8).toUpperCase();
-            const expiresAt = localStorage.getItem('expiresAt') || (Date.now() + 86400000).toString(); // Default 24 hours
-            
-            // If no key in storage, set default demo values
-            if (!localStorage.getItem('accessKey')) {
-                localStorage.setItem('accessKey', accessKey);
-                localStorage.setItem('expiresAt', expiresAt);
-            }
-            
-            // Display key info
-            displayKey.textContent = accessKey;
-            displayExpiry.textContent = new Date(parseInt(expiresAt)).toLocaleString();
-            
-            // Start countdown
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
-        }
-
-        // Update countdown timer
-        function updateCountdown() {
-            const now = Date.now();
-            const expiresAt = parseInt(localStorage.getItem('expiresAt'));
-            const remaining = expiresAt - now;
-            
-            if (remaining <= 0) {
-                countdown.textContent = "SESSION EXPIRED";
-                countdown.style.color = "var(--small-color)";
-                countdown.style.textShadow = "0 0 10px rgba(244, 67, 54, 0.5)";
-                setTimeout(logout, 2000);
-                return;
-            }
-            
-            const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((remaining % (1000 * 60)) / 1000);
-            
-            countdown.textContent = `${days}d ${hours}h ${mins}m ${secs}s`;
-            
-            // Change color when less than 1 hour remains
-            if (remaining < 3600000) {
-                countdown.style.color = "var(--small-color)";
-                countdown.style.textShadow = "0 0 10px rgba(244, 67, 54, 0.5)";
-            } else {
-                countdown.style.color = "var(--big-color)";
-                countdown.style.textShadow = "0 0 10px rgba(76, 175, 80, 0.5)";
-            }
-        }
-
-        // Logout function
+        // Logout
         function logout() {
+            localStorage.removeItem('userLoggedIn');
             localStorage.removeItem('accessKey');
             localStorage.removeItem('expiresAt');
-            // In a real app, you would redirect to login page
-            alert("Session terminated. Redirecting to login...");
-            // For demo purposes, we'll just refresh with new demo data
-            location.reload();
+            window.location.href = "index.html";
         }
 
         // Initialize the game when page loads
         window.addEventListener('load', () => {
             createParticles();
-            initGame();
-            initUserPanel();
-        });
-
-        // OK button click handler
-        okBtn.addEventListener('click', () => {
-            okBtn.classList.add('animate__pulse');
-            setTimeout(() => {
-                okBtn.classList.remove('animate__pulse');
-                initGame();
-            }, 300);
-        });
-
-        // Clear button click handler
-        clearBtn.addEventListener('click', () => {
-            clearBtn.classList.add('animate__pulse');
-            setTimeout(() => {
-                clearBtn.classList.remove('animate__pulse');
-                clearSelections();
-            }, 300);
+            updateTimer();
+            setInterval(updateSessionCountdown, 1000);
+            updateSessionCountdown();
+            fetchAndUpdate();
         });
     </script>
 </body>
