@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Pattern Prediction</title>
+    <title>DARK HACK</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
@@ -788,11 +788,11 @@
         </div>
         
         <header class="header">
-            <h1>Quantum Pattern Prediction</h1>
+            <h1>dark hack</h1>
         </header>
 
         <div class="main-container">
-            <div class="round-timer" id="roundTimer">Next Round: 00:30</div>
+            <div class="round-timer" id="roundTimer">00:30</div>
             
             <div class="result-section">
                 <div class="result-display animate__animated" id="resultDisplay">-</div>
@@ -916,7 +916,7 @@
             const elapsed = Math.floor((now - base) / 1000);
             const remain = 30 - (elapsed % 30);
 
-            roundTimer.textContent = `Next Round: 00:${String(remain).padStart(2, '0')}`;
+            roundTimer.textContent = `00:${String(remain).padStart(2, '0')}`;
             
             if (remain === 30) {
                 showLoading();
