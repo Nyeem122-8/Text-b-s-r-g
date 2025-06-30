@@ -3,1672 +3,571 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BDT Smart AI Predictor - Live Market Edition</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <title>Dark Hack - User Panel</title>
     <style>
-        * {
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d1117;
+            color: #fff;
+            background-image: radial-gradient(circle at 75% 25%, rgba(33, 150, 243, 0.1) 0%, transparent 50%);
         }
         
-        :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --accent: #4cc9f0;
-            --light: #f8f9fa;
-            --dark: #121826;
-            --darker: #0a0e17;
-            --win: #4ade80;
-            --loss: #f87171;
-            --warning: #facc15;
-            --trend-up: #4ade80;
-            --trend-down: #f87171;
-            --trend-neutral: #60a5fa;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            --radius: 12px;
-            --transition: all 0.3s ease;
-        }
-        
-        body {
-            background: linear-gradient(135deg, var(--darker), var(--dark));
-            color: #e2e8f0;
-            line-height: 1.6;
-            min-height: 100vh;
+        /* Dark Hack Styles */
+        .dark-hack-container {
+            max-width: 800px;
+            margin: 20px auto;
             padding: 20px;
-            overflow-x: hidden;
+            text-align: center;
+        }
+        
+        .header-section {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .header-section h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, #4CAF50, #2196F3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+        }
+        
+        .header-section::after {
+            content: "";
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #4CAF50, #2196F3);
+            margin: 10px auto;
+            border-radius: 3px;
+        }
+        
+        .telegram-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #0088cc, #2aabee);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 15px 0;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .telegram-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #0077b5, #2298db);
+        }
+        
+        .telegram-btn i {
+            margin-right: 8px;
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
             display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .logo-icon {
-            background: var(--primary);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 20px;
-        }
-        
-        .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--accent), var(--primary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .stats-bar {
-            display: flex;
-            gap: 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: var(--radius);
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            flex-wrap: wrap;
-        }
-        
-        .stat-card {
-            flex: 1;
-            min-width: 200px;
-            background: rgba(30, 41, 59, 0.7);
-            border-radius: var(--radius);
-            padding: 15px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-        
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            margin: 10px 0;
-        }
-        
-        .win-stat {
-            color: var(--win);
-        }
-        
-        .loss-stat {
-            color: var(--loss);
-        }
-        
-        .panel-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
             gap: 20px;
             margin-bottom: 20px;
         }
         
-        @media (max-width: 900px) {
-            .panel-container {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .panel {
-            background: rgba(30, 41, 59, 0.7);
-            border-radius: var(--radius);
-            padding: 25px;
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .panel-title {
-            font-size: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--accent);
-        }
-        
-        .market-display {
+        .input-section {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
         }
         
-        .current-number {
-            font-size: 80px;
-            font-weight: 800;
-            background: linear-gradient(45deg, var(--accent), var(--primary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-            text-shadow: 0 0 15px rgba(76, 201, 240, 0.3);
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            background-color: #1a1f27;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         
-        .number-label {
-            font-size: 18px;
-            color: #94a3b8;
+        th, td {
+            border: 1px solid #444;
+            padding: 10px;
+            text-align: center;
+            color: #fff;
         }
         
-        .big {
-            color: var(--win);
-        }
-        
-        .small {
-            color: var(--loss);
-        }
-        
-        .timer {
-            background: rgba(255,255,255,0.05);
-            border-radius: 50px;
-            padding: 8px 20px;
-            font-size: 18px;
+        th {
+            background-color: #2d3748;
             font-weight: 600;
         }
         
-        .history-grid {
+        tr:nth-child(even) {
+            background-color: #212835;
+        }
+        
+        .number-buttons {
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .number-btn {
+            padding: 12px 0;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .number-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .prediction-container {
             margin-top: 20px;
-        }
-        
-        .history-item {
-            aspect-ratio: 1;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            background: rgba(30, 41, 59, 0.9);
-            font-size: 18px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .history-item.big {
-            background: rgba(74, 222, 128, 0.15);
-            border: 1px solid rgba(74, 222, 128, 0.3);
-        }
-        
-        .history-item.small {
-            background: rgba(248, 113, 113, 0.15);
-            border: 1px solid rgba(248, 113, 113, 0.3);
-        }
-        
-        .history-item::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--accent);
-        }
-        
-        .prediction-display {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
             padding: 20px;
-            background: rgba(23, 23, 23, 0.6);
-            border-radius: var(--radius);
-            margin-bottom: 25px;
+            background: linear-gradient(135deg, #2d3748, #1a1f27);
+            border-radius: 12px;
+            display: none;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+            border: 1px solid #444;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .prediction-value {
-            font-size: 42px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .prediction-big {
-            color: var(--win);
-        }
-        
-        .prediction-small {
-            color: var(--loss);
-        }
-        
-        .confidence {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .confidence-bar {
-            width: 200px;
-            height: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        
-        .confidence-level {
-            height: 100%;
-            background: linear-gradient(90deg, var(--loss), var(--warning), var(--win));
-            border-radius: 5px;
-        }
-        
-        .confidence-value {
-            font-weight: 600;
-            font-size: 18px;
-        }
-        
-        .pattern-info {
-            font-size: 18px;
-            text-align: center;
-            margin-top: 10px;
-            color: #94a3b8;
-        }
-        
-        .pattern-name {
-            color: var(--accent);
-            font-weight: 600;
-        }
-        
-        .trend-display {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .trend-card {
-            flex: 1;
-            min-width: 120px;
-            background: rgba(30, 41, 59, 0.9);
-            border-radius: var(--radius);
-            padding: 15px;
-            text-align: center;
-        }
-        
-        .trend-title {
-            font-size: 16px;
-            margin-bottom: 10px;
-            color: #94a3b8;
-        }
-        
-        .trend-value {
-            font-size: 24px;
-            font-weight: 700;
-        }
-        
-        .trend-up {
-            color: var(--trend-up);
-        }
-        
-        .trend-down {
-            color: var(--trend-down);
-        }
-        
-        .trend-neutral {
-            color: var(--trend-neutral);
-        }
-        
-        .trigger-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 15px;
-            background: rgba(23, 23, 23, 0.6);
-            border-radius: var(--radius);
-            margin-top: 20px;
-            font-size: 18px;
-        }
-        
-        .trigger-active {
-            color: var(--win);
-        }
-        
-        .trigger-inactive {
-            color: var(--loss);
-        }
-        
-        .trigger-warning {
-            color: var(--warning);
-        }
-        
-        .patterns-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-            margin-top: 25px;
-        }
-        
-        .pattern-card {
-            background: rgba(30, 41, 59, 0.9);
-            border-radius: var(--radius);
-            padding: 15px;
-            transition: var(--transition);
-        }
-        
-        .pattern-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        
-        .pattern-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .pattern-sequence {
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
-        
-        .pattern-type {
-            font-weight: 600;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        
-        .type-big {
-            background: rgba(74, 222, 128, 0.2);
-            color: var(--win);
-        }
-        
-        .type-small {
-            background: rgba(248, 113, 113, 0.2);
-            color: var(--loss);
-        }
-        
-        .pattern-stats {
-            display: flex;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        
-        .pattern-stat {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.05);
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 5px;
-        }
-        
-        .stat-data {
-            font-weight: 700;
-            font-size: 18px;
-        }
-        
-        .active-pattern {
-            border: 2px solid var(--accent);
-            box-shadow: 0 0 15px rgba(76, 201, 240, 0.3);
-        }
-        
-        .action-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .action-buttons {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        .btn {
-            padding: 15px;
-            border-radius: var(--radius);
-            border: none;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-win {
-            background: var(--win);
-            color: #0f172a;
-        }
-        
-        .btn-loss {
-            background: var(--loss);
-            color: white;
-        }
-        
-        .btn-warning {
-            background: var(--warning);
-            color: #0f172a;
-        }
-        
-        .btn-accent {
-            background: var(--accent);
-            color: #0f172a;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: auto;
-            color: #64748b;
-            font-size: 14px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .footer a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-        
-        .pulse {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
             animation: pulse 2s infinite;
         }
         
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(76, 201, 240, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(76, 201, 240, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(76, 201, 240, 0); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         
-        .blink {
-            animation: blink 1s infinite;
+        .prediction-big {
+            color: #4CAF50;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+        
+        .prediction-small {
+            color: #f44336;
+            text-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+        }
+        
+        .confidence {
+            font-size: 16px;
+            color: #aaa;
+            margin: 5px 0;
+        }
+        
+        .wait-message {
+            font-size: 18px;
+            color: #2196F3;
+            margin: 10px 0;
+            font-style: italic;
+            animation: blink 1.5s infinite;
         }
         
         @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
         
-        .market-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-        
-        .status-live {
-            background: rgba(248, 113, 113, 0.2);
-            color: var(--loss);
-        }
-        
-        .status-connected {
-            background: rgba(74, 222, 128, 0.2);
-            color: var(--win);
-        }
-        
-        .api-status {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        
-        .status-online {
-            background: var(--win);
-        }
-        
-        .status-offline {
-            background: var(--loss);
-        }
-        
-        .chart-container {
-            background: rgba(30, 41, 59, 0.7);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-top: 20px;
-            height: 300px;
-        }
-        
-        .signals-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .signal-card {
-            background: rgba(30, 41, 59, 0.9);
-            border-radius: var(--radius);
-            padding: 15px;
-            text-align: center;
-        }
-        
-        .signal-title {
-            font-size: 16px;
-            margin-bottom: 10px;
-            color: #94a3b8;
-        }
-        
-        .signal-value {
-            font-size: 24px;
-            font-weight: 700;
-        }
-        
-        .signal-big {
-            color: var(--win);
-        }
-        
-        .signal-small {
-            color: var(--loss);
-        }
-        
-        .signal-neutral {
-            color: var(--trend-neutral);
-        }
-        
-        .pattern-analysis-panel {
-            background: rgba(30, 41, 59, 0.9);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-top: 20px;
-            border: 2px solid var(--warning);
-        }
-        
-        .analysis-title {
-            font-size: 22px;
-            margin-bottom: 15px;
-            color: var(--warning);
-            text-align: center;
-        }
-        
-        .pattern-analysis {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 15px;
-        }
-        
-        @media (max-width: 768px) {
-            .pattern-analysis {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .analysis-card {
-            background: rgba(23, 23, 23, 0.6);
-            border-radius: var(--radius);
-            padding: 15px;
-        }
-        
-        .analysis-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .analysis-label {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--accent);
-        }
-        
-        .analysis-result {
-            font-size: 20px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-        
-        .analysis-result.opposite {
-            color: var(--loss);
-        }
-        
-        .analysis-result.confirmed {
-            color: var(--win);
-        }
-        
-        .analysis-details {
-            margin-top: 15px;
-            font-size: 16px;
-        }
-        
-        .analysis-details ul {
-            padding-left: 20px;
-            margin-top: 10px;
-        }
-        
-        .analysis-details li {
-            margin-bottom: 8px;
-        }
-        
-        .opposite-pattern {
-            color: var(--loss);
-            font-weight: 700;
-        }
-        
-        .confirmed-pattern {
-            color: var(--win);
-            font-weight: 700;
-        }
-        
-        .pattern-sequence-display {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .pattern-item {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 16px;
-        }
-        
-        .pattern-item.big {
-            background: var(--win);
-            color: #000;
-        }
-        
-        .pattern-item.small {
-            background: var(--loss);
-            color: white;
-        }
-        
-        .pattern-item.prediction {
-            border: 3px solid var(--accent);
-        }
-        
-        .game-selector {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: var(--radius);
-            padding: 8px 15px;
-            color: white;
-            font-size: 16px;
-            margin-left: 20px;
-        }
-        
-        .game-selector:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        
-        .market-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        
-        .market-table th {
-            background: var(--primary);
-            padding: 10px;
-            text-align: center;
-        }
-        
-        .market-table td {
-            padding: 10px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .market-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .market-table tr:hover {
-            background: rgba(255,255,255,0.05);
-        }
-        
-        .market-history {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
-            justify-content: center;
-        }
-        
-        .market-history-item {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            background: rgba(30, 41, 59, 0.9);
-            font-size: 16px;
-        }
-        
-        .market-history-item.big {
-            background: rgba(74, 222, 128, 0.2);
-            border: 1px solid rgba(74, 222, 128, 0.3);
-        }
-        
-        .market-history-item.small {
-            background: rgba(248, 113, 113, 0.2);
-            border: 1px solid rgba(248, 113, 113, 0.3);
-        }
-        
-        .live-market-container {
-            background: rgba(30, 41, 59, 0.7);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .market-table-container {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            margin-top: 20px;
-        }
-        
-        .market-table-wrapper {
+        /* User Panel Styles */
+        .user-panel-container {
             max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #1a1f27;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card {
+            background: #212835;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+        }
+        
+        .key-display {
+            font-family: monospace;
+            background: #2d3748;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            color: #fff;
+            border: 1px solid #444;
+        }
+        
+        .timer {
+            font-size: 24px;
+            text-align: center;
+            margin: 20px 0;
+            color: #fff;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            background: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: block;
             width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background: #166fe5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <div class="logo-text">BDT AI Predictor</div>
-            </div>
-            <div class="timer">
-                <i class="fas fa-clock"></i> <span id="countdown">00:30</span>
-                <div class="api-status">
-                    <span class="status-indicator status-online"></span>
-                    <span>Market: <span id="market-status">LIVE</span></span>
-                </div>
-                <select class="game-selector" id="game-selector">
-                    <option value="30">Baccarat</option>
-                    <option value="10">Lucky 5</option>
-                    <option value="20">Speed Car</option>
-                </select>
-            </div>
-        </header>
+    <!-- Dark Hack Section -->
+    <div class="dark-hack-container">
+        <div class="header-section">
+            <h1>Dark Hack</h1>
+            <a href="https://t.me/dark67hack" class="telegram-btn" target="_blank">
+                <i class="fab fa-telegram"></i> Join Telegram
+            </a>
+        </div>
         
-        <div class="panel-container">
-            <div class="panel">
-                <div class="panel-title">
-                    <i class="fas fa-robot"></i> AI Prediction System
-                </div>
-                
-                <div class="prediction-display">
-                    <div class="number-label">AI Recommendation</div>
-                    <div class="prediction-value" id="prediction-value">--</div>
-                    
-                    <div class="confidence">
-                        <div class="confidence-bar">
-                            <div class="confidence-level" id="confidence-level" style="width: 0%"></div>
-                        </div>
-                        <div class="confidence-value" id="confidence-value">0%</div>
-                    </div>
-                    
-                    <div class="pattern-info">
-                        Detected Pattern: <span class="pattern-name" id="pattern-name">Analyzing...</span>
-                    </div>
-                </div>
-                
-                <div class="panel-title">
-                    <i class="fas fa-history"></i> Recent Numbers
-                </div>
-                <div class="history-grid" id="history-grid">
-                    <!-- History items will be dynamically added -->
-                </div>
-            </div>
-            
-            <div class="panel">
-                <div class="panel-title">
-                    <i class="fas fa-chart-line"></i> Market Analysis
-                </div>
-                
-                <div class="market-display">
-                    <div class="current-number" id="current-number">--</div>
-                    <div class="number-label">
-                        Last Number: <span id="number-type">--</span>
-                    </div>
-                    <div class="timer">
-                        <i class="fas fa-sync-alt blink"></i> Next update: <span id="market-timer">00:30</span>
-                        <div class="market-status status-connected" id="connection-status">Connected to Market API</div>
-                    </div>
-                </div>
-                
-                <div class="panel-title">
-                    <i class="fas fa-chart-bar"></i> Pattern Distribution
-                </div>
-                <div class="chart-container">
-                    <canvas id="pattern-chart"></canvas>
-                </div>
-                
-                <div class="trigger-status">
-                    <i class="fas fa-bolt"></i> 
-                    <span class="trigger-active" id="trigger-message">Pattern matched - Strong Entry Signal</span>
+        <div class="container">
+            <div class="input-section">
+                <div class="number-buttons">
+                    <button class="number-btn" onclick="addNumber(0)">0</button>
+                    <button class="number-btn" onclick="addNumber(1)">1</button>
+                    <button class="number-btn" onclick="addNumber(2)">2</button>
+                    <button class="number-btn" onclick="addNumber(3)">3</button>
+                    <button class="number-btn" onclick="addNumber(4)">4</button>
+                    <button class="number-btn" onclick="addNumber(5)">5</button>
+                    <button class="number-btn" onclick="addNumber(6)">6</button>
+                    <button class="number-btn" onclick="addNumber(7)">7</button>
+                    <button class="number-btn" onclick="addNumber(8)">8</button>
+                    <button class="number-btn" onclick="addNumber(9)">9</button>
                 </div>
             </div>
         </div>
         
-        <!-- Pattern Analysis Panel -->
-        <div class="pattern-analysis-panel">
-            <div class="analysis-title">
-                <i class="fas fa-search"></i> Advanced Pattern Analysis
-            </div>
-            
-            <div class="pattern-analysis">
-                <div class="analysis-card">
-                    <div class="analysis-header">
-                        <div class="analysis-label">Current Pattern Type:</div>
-                        <div class="analysis-result" id="pattern-type-result">--</div>
-                    </div>
-                    <div class="analysis-details">
-                        <p>The AI has detected a potential pattern in the current market behavior:</p>
-                        <ul>
-                            <li>Previous predictions: <span id="prev-predictions">--</span></li>
-                            <li>Actual outcomes: <span id="actual-outcomes">--</span></li>
-                            <li>Pattern consistency: <span id="pattern-consistency">--</span></li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="analysis-card">
-                    <div class="analysis-header">
-                        <div class="analysis-label">Opposite Pattern:</div>
-                        <div class="analysis-result" id="opposite-pattern-result">--</div>
-                    </div>
-                    <div class="analysis-details">
-                        <p>Analysis of prediction vs actual outcomes:</p>
-                        <ul>
-                            <li>Opposite pattern detected: <span id="opposite-detected">--</span></li>
-                            <li>Pattern strength: <span id="pattern-strength-value">--</span></li>
-                            <li>Predicted next outcome: <span id="next-prediction">--</span></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="pattern-sequence-display" id="pattern-sequence">
-                <!-- Pattern sequence will be dynamically added -->
-            </div>
+        <div id="waitMessage" class="wait-message" style="display: none;">Please wait while analyzing...</div>
+        
+        <div id="predictionContainer" class="prediction-container">
+            <h3>Next Prediction</h3>
+            <div id="predictionValue" class="prediction-value"></div>
+            <div id="predictionConfidence" class="confidence"></div>
         </div>
         
-        <div class="panel">
-            <div class="panel-title">
-                <i class="fas fa-th-large"></i> Pattern Recognition System
-            </div>
-            
-            <div class="patterns-section" id="patterns-section">
-                <!-- Pattern cards will be dynamically added -->
-            </div>
-        </div>
-        
-        <!-- Centered Market Table Section -->
-        <div class="market-table-container">
-            <div class="market-table-wrapper">
-                <div class="panel">
-                    <div class="panel-title">
-                        <i class="fas fa-table"></i> Recent Market Results
-                    </div>
-                    <div id="gameDataContainer"></div>
-                    
-                    <div class="panel-title">
-                        <i class="fas fa-history"></i> Market History
-                    </div>
-                    <div class="market-history" id="market-history">
-                        <!-- Market history items will be dynamically added -->
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="action-buttons">
-            <button class="btn btn-primary" id="refresh-btn">
-                <i class="fas fa-sync"></i> Refresh Data
-            </button>
-            <button class="btn btn-win" id="win-btn">
-                <i class="fas fa-check-circle"></i> Mark as Win
-            </button>
-            <button class="btn btn-loss" id="loss-btn">
-                <i class="fas fa-times-circle"></i> Mark as Loss
-            </button>
-            <button class="btn btn-warning" id="analyze-btn">
-                <i class="fas fa-search"></i> Analyze Pattern
-            </button>
-        </div>
-        
-        <div class="footer">
-            <p>BDT Trend AI Predictor v4.5 • Advanced Pattern Detection • Live Market Integration</p>
-            <p>Disclaimer: Gambling involves risk. Use at your own discretion. Not financial advice.</p>
-        </div>
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Issue</th>
+                    <th>Number</th>
+                    <th>B/S</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Results will be added here -->
+            </tbody>
+        </table>
     </div>
     
+    <!-- User Panel Section -->
+    <div class="user-panel-container">
+        <div class="card">
+            <h2>Your Access</h2>
+            <div class="key-display">
+                <strong>Key:</strong> <span id="displayKey"></span><br>
+                <strong>Expires:</strong> <span id="displayExpiry"></span>
+            </div>
+            
+            <div class="timer">
+                <p>Time Remaining:</p>
+                <div id="countdown"></div>
+            </div>
+            
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAWs4V81fLFH6khFkHe0oJIbJeXuZs1DI4",
-            authDomain: "dark-tools-93abd.firebaseapp.com",
-            databaseURL: "https://dark-tools-93abd-default-rtdb.firebaseio.com",
-            projectId: "dark-tools-93abd",
-            storageBucket: "dark-tools-93abd.appspot.com",
-            messagingSenderId: "1003509016475",
-            appId: "1:1003509016475:android:826836719187aa12fc633e"
-        };
+        // Dark Hack Scripts
+        let currentIssue = 1;
+        const maxRows = 10;
+        let gameHistory = [];
         
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        
-        // Enhanced pattern database with all 20 patterns including the new trends
-        let patterns = [
-            // Original patterns (10)
-            { sequence: "B-S-B-S-B", type: "Single Trend", accuracy: 89, usage: 45, streak: 5, lastUsed: "2m ago", description: "Alternating results (Big > Small > Big > Small)" },
-            { sequence: "S-S-B-B-S-S", type: "Double Trend", accuracy: 85, usage: 32, streak: 3, lastUsed: "5m ago", description: "Two same results then switch (Small-Small > Big-Big)" },
-            { sequence: "B-B-B-S-S-S", type: "Triple Trend", accuracy: 82, usage: 28, streak: 2, lastUsed: "8m ago", description: "Three same results then switch (Big-Big-Big > Small-Small-Small)" },
-            { sequence: "S-S-S-S-B-B-B-B", type: "Quadra Trend", accuracy: 78, usage: 21, streak: 4, lastUsed: "12m ago", description: "Four same results then switch (Small x4 > Big x4)" },
-            { sequence: "B-B-B-S-B-B-B", type: "Three in One", accuracy: 76, usage: 18, streak: 1, lastUsed: "15m ago", description: "Three same, one opposite, then three same again" },
-            { sequence: "S-S-B-S-S-B-S-S", type: "Two in One", accuracy: 74, usage: 16, streak: 0, lastUsed: "18m ago", description: "Two same, one opposite, repeating pattern" },
-            { sequence: "B-B-B-S-S-B-B-B", type: "Three in Two", accuracy: 72, usage: 14, streak: -1, lastUsed: "22m ago", description: "Three same, two opposite, then three same" },
-            { sequence: "S-S-S-S-B-S-S-S-S", type: "Four in One", accuracy: 70, usage: 12, streak: -2, lastUsed: "25m ago", description: "Four same, one opposite, then four same" },
-            { sequence: "B-B-B-B-S-S-B-B-B-B", type: "Four in Two", accuracy: 68, usage: 10, streak: 1, lastUsed: "30m ago", description: "Four same, two opposite, then four same" },
-            { sequence: "S-S-S-S-S-S-S-S-S-S", type: "Long Trend", accuracy: 65, usage: 8, streak: -3, lastUsed: "35m ago", description: "Extended sequence of same results (10+ in a row)" },
+        function analyzePatterns(numbers) {
+            const strategies = [];
             
-            // New trend patterns (10)
-            { sequence: "B-S-B-S-B-S", type: "Single Trend", accuracy: 87, usage: 40, streak: 4, lastUsed: "3m ago", description: "Consistent alternating results (Big-Small-Big-Small)" },
-            { sequence: "B-B-S-S-B-B-S-S", type: "Double Trend", accuracy: 83, usage: 35, streak: 3, lastUsed: "7m ago", description: "Two same results then switch repeatedly" },
-            { sequence: "B-B-B-S-S-S-B-B-B", type: "Triple Trend", accuracy: 80, usage: 30, streak: 2, lastUsed: "10m ago", description: "Three same results then switch back" },
-            { sequence: "B-B-B-B-S-S-S-S-B-B", type: "Quadra Trend", accuracy: 77, usage: 25, streak: 3, lastUsed: "14m ago", description: "Four same results then switch and continue" },
-            { sequence: "B-B-B-S-B-B-B-S-B-B", type: "Three in One", accuracy: 75, usage: 22, streak: 1, lastUsed: "17m ago", description: "Three same, one opposite, continuing pattern" },
-            { sequence: "B-B-S-B-B-S-B-B-S", type: "Two in One", accuracy: 73, usage: 20, streak: 0, lastUsed: "20m ago", description: "Two same, one opposite, repeating sequence" },
-            { sequence: "B-B-B-S-S-B-B-B-S-S", type: "Three in Two", accuracy: 71, usage: 18, streak: -1, lastUsed: "24m ago", description: "Three same, two opposite, then repeat" },
-            { sequence: "B-B-B-B-S-B-B-B-B-S", type: "Four in One", accuracy: 69, usage: 16, streak: -2, lastUsed: "27m ago", description: "Four same, one opposite, continuing" },
-            { sequence: "B-B-B-B-S-S-B-B-B-B-S-S", type: "Four in Two", accuracy: 67, usage: 14, streak: 1, lastUsed: "31m ago", description: "Four same, two opposite, repeating" },
-            { sequence: "B-B-B-B-B-B-B-B-B-B-B", type: "Long Trend", accuracy: 64, usage: 12, streak: -4, lastUsed: "36m ago", description: "Extended sequence of same results (11+ in a row)" }
-        ];
-        
-        // Market data
-        let marketNumbers = [];
-        let patternChart = null;
-        let winCount = 0;
-        let lossCount = 0;
-        let currentStreak = 0;
-        let bestStreak = 0;
-        let predictionHistory = [];
-        let actualHistory = [];
-        let lastIssueNumber = null;
-        let firstLoad = true;
-        let uploadedIssues = new Set();
-        let gameType = "30"; // Default game type
-        
-        // DOM elements
-        const countdownEl = document.getElementById('countdown');
-        const marketTimerEl = document.getElementById('market-timer');
-        const currentNumberEl = document.getElementById('current-number');
-        const numberTypeEl = document.getElementById('number-type');
-        const historyGridEl = document.getElementById('history-grid');
-        const predictionValueEl = document.getElementById('prediction-value');
-        const confidenceLevelEl = document.getElementById('confidence-level');
-        const confidenceValueEl = document.getElementById('confidence-value');
-        const patternNameEl = document.getElementById('pattern-name');
-        const patternMatchEl = document.getElementById('pattern-match');
-        const patternStrengthEl = document.getElementById('pattern-strength');
-        const triggerStatusEl = document.getElementById('trigger-status');
-        const triggerMessageEl = document.getElementById('trigger-message');
-        const patternsSectionEl = document.getElementById('patterns-section');
-        const refreshBtn = document.getElementById('refresh-btn');
-        const marketStatusEl = document.getElementById('market-status');
-        const connectionStatusEl = document.getElementById('connection-status');
-        const patternAccuracyEl = document.getElementById('pattern-accuracy');
-        const successRateEl = document.getElementById('success-rate');
-        const winBtn = document.getElementById('win-btn');
-        const lossBtn = document.getElementById('loss-btn');
-        const analyzeBtn = document.getElementById('analyze-btn');
-        const patternTypeResultEl = document.getElementById('pattern-type-result');
-        const oppositePatternResultEl = document.getElementById('opposite-pattern-result');
-        const prevPredictionsEl = document.getElementById('prev-predictions');
-        const actualOutcomesEl = document.getElementById('actual-outcomes');
-        const patternConsistencyEl = document.getElementById('pattern-consistency');
-        const oppositeDetectedEl = document.getElementById('opposite-detected');
-        const patternStrengthValueEl = document.getElementById('pattern-strength-value');
-        const nextPredictionEl = document.getElementById('next-prediction');
-        const patternSequenceEl = document.getElementById('pattern-sequence');
-        const gameSelectorEl = document.getElementById('game-selector');
-        const gameDataContainer = document.getElementById('gameDataContainer');
-        const marketHistoryEl = document.getElementById('market-history');
-        
-        // Initialize the app
-        function init() {
-            renderPatterns();
-            initCharts();
-            startLiveTimer();
-            fetchAndUpdate();
-            
-            // Add event listeners
-            refreshBtn.addEventListener('click', fetchAndUpdate);
-            winBtn.addEventListener('click', markAsWin);
-            lossBtn.addEventListener('click', markAsLoss);
-            analyzeBtn.addEventListener('click', analyzePattern);
-            gameSelectorEl.addEventListener('change', function() {
-                gameType = this.value;
-                uploadedIssues = new Set();
-                marketNumbers = [];
-                actualHistory = [];
-                predictionHistory = [];
-                historyGridEl.innerHTML = '';
-                gameDataContainer.innerHTML = '';
-                marketHistoryEl.innerHTML = '';
-                fetchAndUpdate();
-            });
-        }
-        
-        // Initialize charts
-        function initCharts() {
-            // Pattern chart
-            const ctx = document.getElementById('pattern-chart').getContext('2d');
-            patternChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: patterns.slice(0, 8).map(p => p.sequence),
-                    datasets: [{
-                        label: 'Pattern Accuracy (%)',
-                        data: patterns.slice(0, 8).map(p => p.accuracy),
-                        backgroundColor: patterns.slice(0, 8).map(p => p.type.includes('Trend') ? 'rgba(74, 222, 128, 0.7)' : 'rgba(248, 113, 113, 0.7)'),
-                        borderColor: patterns.slice(0, 8).map(p => p.type.includes('Trend') ? 'rgba(74, 222, 128, 1)' : 'rgba(248, 113, 113, 1)'),
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                color: '#94a3b8'
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#94a3b8'
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#e2e8f0'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Render history numbers
-        function renderHistory() {
-            historyGridEl.innerHTML = '';
-            marketNumbers.slice(-10).forEach(num => {
-                const isBig = num >= 5;
-                const item = document.createElement('div');
-                item.className = `history-item ${isBig ? 'big' : 'small'}`;
-                item.textContent = num;
-                historyGridEl.prepend(item);
-            });
-        }
-        
-        // Render pattern cards with descriptions
-        function renderPatterns() {
-            patternsSectionEl.innerHTML = '';
-            patterns.forEach(pattern => {
-                const card = document.createElement('div');
-                card.className = 'pattern-card';
-                if (pattern.accuracy > 90) {
-                    card.classList.add('active-pattern');
-                }
-                card.innerHTML = `
-                    <div class="pattern-header">
-                        <div class="pattern-sequence">${pattern.sequence}</div>
-                        <div class="pattern-type type-${pattern.type.includes('Trend') ? 'big' : 'small'}">${pattern.type}</div>
-                    </div>
-                    <div class="text-sm text-gray-400 mb-2">${pattern.description}</div>
-                    <div>Accuracy: <strong>${pattern.accuracy}%</strong> | Used: ${pattern.usage} times</div>
-                    <div class="pattern-stats">
-                        <div class="pattern-stat">
-                            <div class="stat-label">Success Rate</div>
-                            <div class="stat-data">${pattern.accuracy}%</div>
-                        </div>
-                        <div class="pattern-stat">
-                            <div class="stat-label">Last Used</div>
-                            <div class="stat-data">${pattern.lastUsed}</div>
-                        </div>
-                        <div class="pattern-stat">
-                            <div class="stat-label">Streak</div>
-                            <div class="stat-data">${pattern.streak > 0 ? '+' : ''}${pattern.streak}</div>
-                        </div>
-                    </div>
-                `;
-                patternsSectionEl.appendChild(card);
-            });
-        }
-        
-        // Fetch live market data
-        async function fetchAndUpdate() {
-            try {
-                // Update status
-                connectionStatusEl.textContent = "Fetching market data...";
-                connectionStatusEl.className = "market-status status-live";
-                
-                const res = await fetch('https://crbbb.com/api/webapi/GetNoaverageEmerdList', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-                    body: JSON.stringify({
-                        pageSize: 10,
-                        pageNo: 1,
-                        typeId: parseInt(gameType),
-                        language: 0,
-                        random: "62d02162c2234c64b57aa4188c5810b2",
-                        signature: "9BF7A245709AA054E231D75C404C6527",
-                        timestamp: Math.floor(Date.now() / 1000)
-                    })
+            // Strategy 1: Check for repeating numbers or small range
+            const lastNumber = numbers[0];
+            const isRepeating = numbers.slice(0, 3).every(n => n === lastNumber);
+            if (isRepeating) {
+                strategies.push({
+                    prediction: lastNumber <= 4 ? 'B' : 'S',
+                    confidence: 70 + Math.floor(Math.random() * 10),
+                    strategy: "Repeating number pattern detected"
                 });
-
-                const json = await res.json();
-                const list = json?.data?.list;
-                if (!list?.length) return;
-
-                const latest = list[0];
-                const currentIssue = latest.issueNumber;
-
-                // First load: push all to Firebase
-                if (firstLoad) {
-                    list.forEach((item) => {
-                        if (!uploadedIssues.has(item.issueNumber)) {
-                            db.ref('HACK').push({
-                                number: item.number,
-                                issueNumber: item.issueNumber,
-                                time: new Date().toISOString()
-                            });
-                            uploadedIssues.add(item.issueNumber);
-                        }
+            }
+            
+            // Strategy 2: Opposite after multiple repeats
+            const recentNumbers = numbers.slice(0, 5);
+            const countRecent = recentNumbers.filter(n => n === lastNumber).length;
+            if (countRecent >= 3) {
+                strategies.push({
+                    prediction: lastNumber <= 4 ? 'B' : 'S',
+                    confidence: 75 + Math.floor(Math.random() * 10),
+                    strategy: "Opposite after multiple repeats"
+                });
+            }
+            
+            // Strategy 3: After 5 small numbers, expect big
+            const lastFiveSmall = numbers.slice(0, 5).every(n => n <= 4);
+            if (lastFiveSmall) {
+                strategies.push({
+                    prediction: 'B',
+                    confidence: 80 + Math.floor(Math.random() * 10),
+                    strategy: "After 5 consecutive small numbers"
+                });
+            }
+            
+            // Strategy 4: Last digit 7 or 9 predicts small
+            const lastDigit = lastNumber % 10;
+            if (lastDigit === 7 || lastDigit === 9) {
+                strategies.push({
+                    prediction: 'S',
+                    confidence: 65 + Math.floor(Math.random() * 10),
+                    strategy: "Last digit 7 or 9 pattern"
+                });
+            }
+            
+            // Strategy 5: Double numbers predict small
+            if (numbers[0] === numbers[1]) {
+                strategies.push({
+                    prediction: 'S',
+                    confidence: 60 + Math.floor(Math.random() * 10),
+                    strategy: "Double numbers pattern"
+                });
+            }
+            
+            // Strategy 6: Extreme numbers (1 and 9) predict small
+            if (numbers.some(n => n === 1) && numbers.some(n => n === 9)) {
+                strategies.push({
+                    prediction: 'S',
+                    confidence: 55 + Math.floor(Math.random() * 10),
+                    strategy: "Extreme numbers present"
+                });
+            }
+            
+            // Strategy 7: After 3 even numbers, expect odd (small)
+            const lastThreeEven = numbers.slice(0, 3).every(n => n % 2 === 0);
+            if (lastThreeEven) {
+                strategies.push({
+                    prediction: 'S',
+                    confidence: 70 + Math.floor(Math.random() * 10),
+                    strategy: "After 3 even numbers"
+                });
+            }
+            
+            // Strategy 8: Sum of last two > 10 predicts big
+            if (numbers.length >= 2) {
+                const sumLastTwo = numbers[0] + numbers[1];
+                if (sumLastTwo > 10) {
+                    strategies.push({
+                        prediction: 'B',
+                        confidence: 65 + Math.floor(Math.random() * 10),
+                        strategy: "Sum of last two numbers > 10"
                     });
-                    firstLoad = false;
-                    lastIssueNumber = currentIssue;
-                    updateCurrentNumberDisplay(latest);
-                    renderMarketTable(list);
-                    return;
                 }
-
-                // Subsequent updates: only push new numbers
-                if (currentIssue !== lastIssueNumber && !uploadedIssues.has(currentIssue)) {
-                    db.ref('HACK').push({
-                        number: latest.number,
-                        issueNumber: latest.issueNumber,
-                        time: new Date().toISOString()
-                    });
-                    uploadedIssues.add(currentIssue);
-                    lastIssueNumber = currentIssue;
-                    updateCurrentNumberDisplay(latest);
-                    renderMarketTable(list);
-                    
-                    // Update prediction with live data
-                    const lastDigit = parseInt(latest.number.toString().slice(-1));
-                    marketNumbers.push(lastDigit);
-                    if (marketNumbers.length > 10) marketNumbers.shift();
-                    
-                    updateCurrentNumberDisplay({ number: lastDigit });
-                    renderHistory();
-                    updatePrediction();
-                    analyzePattern();
-                    updateStats();
-                }
-
-                // Show success status
-                connectionStatusEl.textContent = "Market data updated successfully";
-                connectionStatusEl.className = "market-status status-connected";
+            }
+            
+            // Strategy 9: After 0 or 1, expect big jump
+            if (numbers[0] === 0 || numbers[0] === 1) {
+                strategies.push({
+                    prediction: 'B',
+                    confidence: 75 + Math.floor(Math.random() * 10),
+                    strategy: "After 0 or 1 pattern"
+                });
+            }
+            
+            // Strategy 10: After 5 same numbers, expect break
+            const allSame = numbers.slice(0, 5).every(n => n === numbers[0]);
+            if (allSame) {
+                strategies.push({
+                    prediction: numbers[0] <= 4 ? 'B' : 'S',
+                    confidence: 85 + Math.floor(Math.random() * 10),
+                    strategy: "Break after 5 same numbers"
+                });
+            }
+            
+            // If no strategies matched, use basic probability
+            if (strategies.length === 0) {
+                const smallCount = numbers.filter(n => n <= 4).length;
+                const bigCount = numbers.filter(n => n > 4).length;
                 
-            } catch (error) {
-                console.error("Fetch error:", error);
-                connectionStatusEl.textContent = "Connection failed. Retrying...";
-                connectionStatusEl.className = "market-status status-live";
+                strategies.push({
+                    prediction: smallCount > bigCount ? 'B' : 'S',
+                    confidence: 50 + Math.floor(Math.random() * 10),
+                    strategy: "Basic probability analysis"
+                });
             }
-        }
-        
-        // Update current number display
-        function updateCurrentNumberDisplay(item) {
-            const number = Number(item.number);
-            currentNumberEl.textContent = number;
-            currentNumberEl.classList.add('pulse');
-            setTimeout(() => currentNumberEl.classList.remove('pulse'), 1000);
             
-            const lastDigit = parseInt(number.toString().slice(-1));
-            const isBig = lastDigit >= 5;
-            numberTypeEl.textContent = isBig ? 'BIG' : 'SMALL';
-            numberTypeEl.className = isBig ? 'big' : 'small';
-            
-            // Update actual history
-            actualHistory.push(isBig ? 'BIG' : 'SMALL');
-            if (actualHistory.length > 10) actualHistory.shift();
-            
-            // Add to market history
-            const historyItem = document.createElement('div');
-            historyItem.className = `market-history-item ${isBig ? 'big' : 'small'}`;
-            historyItem.textContent = lastDigit;
-            marketHistoryEl.prepend(historyItem);
-            
-            // Keep only last 20 items
-            if (marketHistoryEl.children.length > 20) {
-                marketHistoryEl.removeChild(marketHistoryEl.lastChild);
+            // Find the strategy with highest confidence
+            let bestStrategy = strategies[0];
+            for (const strategy of strategies) {
+                if (strategy.confidence > bestStrategy.confidence) {
+                    bestStrategy = strategy;
+                }
             }
+            
+            return bestStrategy;
         }
-        
-        // Render market table
-        function renderMarketTable(data) {
-            gameDataContainer.innerHTML = '';
-            const table = document.createElement('table');
-            table.className = 'market-table w-full text-sm text-center bg-gray-800';
-            table.innerHTML = `
-                <thead class="bg-blue-600 text-black">
-                    <tr>
-                        <th>Issue Number</th>
-                        <th>Number</th>
-                        <th>Last Digit</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${data.map((item) => {
-                        const lastDigit = parseInt(item.number.toString().slice(-1));
-                        const isBig = lastDigit >= 5;
-                        return `
-                            <tr class="hover:bg-gray-600">
-                                <td>${item.issueNumber}</td>
-                                <td>${item.number}</td>
-                                <td>${lastDigit}</td>
-                                <td class="${isBig ? 'big' : 'small'}">${isBig ? 'BIG' : 'SMALL'}</td>
-                            </tr>`;
-                    }).join('')}
-                </tbody>`;
-            gameDataContainer.appendChild(table);
-        }
-        
-        // Update prediction with enhanced pattern detection
+
         function updatePrediction() {
-            if (marketNumbers.length === 0) return;
+            if (gameHistory.length < 5) return;
             
-            // Get the latest number
-            const latestNumber = marketNumbers[marketNumbers.length - 1];
-            const isBig = latestNumber >= 5;
+            // Show wait message
+            const waitMessage = document.getElementById('waitMessage');
+            waitMessage.style.display = 'block';
             
-            // Find matching patterns from history
-            const history = marketNumbers.map(num => num >= 5 ? 'B' : 'S').join('-');
+            // Hide prediction container while analyzing
+            const predictionContainer = document.getElementById('predictionContainer');
+            predictionContainer.style.display = 'none';
             
-            // Check for matching patterns
-            let matchedPattern = null;
-            let highestAccuracy = 0;
-            
-            patterns.forEach(pattern => {
-                // Check if the pattern sequence matches the end of our history
-                if (history.endsWith(pattern.sequence.replace(/-/g, ''))) {
-                    if (pattern.accuracy > highestAccuracy) {
-                        highestAccuracy = pattern.accuracy;
-                        matchedPattern = pattern;
-                    }
-                }
-            });
-            
-            let prediction;
-            let confidence;
-            let patternName;
-            
-            if (matchedPattern) {
-                // We found a matching pattern - use it for prediction
-                patternName = `${matchedPattern.sequence} (${matchedPattern.type})`;
+            // Simulate analysis delay
+            setTimeout(() => {
+                const prediction = analyzePatterns(gameHistory);
+                const predictionValue = document.getElementById('predictionValue');
+                const predictionConfidence = document.getElementById('predictionConfidence');
                 
-                if (matchedPattern.type.includes('Trend')) {
-                    // For trend patterns, predict the next in sequence
-                    const sequenceParts = matchedPattern.sequence.split('-');
-                    const lastPart = sequenceParts[sequenceParts.length - 1];
-                    prediction = lastPart === 'B' ? 'SMALL' : 'BIG'; // Opposite of last in trend
-                    confidence = Math.min(95, matchedPattern.accuracy + Math.floor(Math.random() * 6)); // 0-5% boost
-                } else {
-                    // For opposite patterns, predict the opposite of the pattern's suggestion
-                    const sequenceParts = matchedPattern.sequence.split('-');
-                    const lastPart = sequenceParts[sequenceParts.length - 1];
-                    prediction = lastPart === 'B' ? 'BIG' : 'SMALL'; // Same as last in opposite
-                    confidence = Math.min(98, matchedPattern.accuracy + Math.floor(Math.random() * 11)); // 0-10% boost
-                }
-            } else {
-                // No pattern matched - use random prediction with lower confidence
-                const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
-                patternName = `Random (${randomPattern.type})`;
+                // Hide wait message
+                waitMessage.style.display = 'none';
                 
-                if (Math.random() < 0.7) { // 70% chance to follow normal prediction
-                    prediction = isBig ? 'SMALL' : 'BIG'; // Opposite of current
-                    confidence = Math.floor(Math.random() * 21) + 70; // 70-90%
-                } else { // 30% chance to predict same as current
-                    prediction = isBig ? 'BIG' : 'SMALL';
-                    confidence = Math.floor(Math.random() * 16) + 60; // 60-75%
-                }
+                // Show prediction
+                predictionValue.textContent = prediction.prediction;
+                predictionValue.className = `prediction-value ${prediction.prediction === 'B' ? 'prediction-big' : 'prediction-small'}`;
+                predictionConfidence.textContent = `${prediction.confidence}% confidence`;
+                predictionContainer.style.display = 'block';
+                
+                // Add animation
+                predictionContainer.style.animation = 'none';
+                void predictionContainer.offsetWidth; // Trigger reflow
+                predictionContainer.style.animation = 'fadeIn 0.5s ease-out';
+                
+            }, 3000); // 3 second delay for analysis
+        }
+
+        function addNumber(number) {
+            // Determine B/S
+            const result = (number <= 4) ? 'S' : 'B';
+            
+            // Add to table
+            const tableBody = document.getElementById('tableBody');
+            const newRow = tableBody.insertRow(0);
+            
+            newRow.insertCell(0).textContent = currentIssue;
+            newRow.insertCell(1).textContent = number;
+            newRow.insertCell(2).textContent = result;
+            
+            // Add to game history for prediction
+            gameHistory.unshift(number);
+            if (gameHistory.length > 10) {
+                gameHistory.pop();
             }
             
-            // Apply some randomness to confidence
-            confidence = Math.max(60, Math.min(98, confidence + Math.floor(Math.random() * 11) - 5)); // +/-5%
+            // Update prediction
+            updatePrediction();
             
-            predictionValueEl.textContent = prediction;
-            predictionValueEl.className = `prediction-value ${prediction === 'BIG' ? 'prediction-big' : 'prediction-small'}`;
-            
-            confidenceLevelEl.style.width = `${confidence}%`;
-            confidenceValueEl.textContent = `${confidence}%`;
-            patternNameEl.textContent = patternName;
-            
-            // Update trend and trigger status based on confidence
-            let trend, patternStrength, trigger;
-            
-            if (confidence > 85) {
-                trend = "Strong";
-                patternStrength = "High";
-                trigger = "Active";
-            } else if (confidence > 75) {
-                trend = "Medium";
-                patternStrength = "Medium";
-                trigger = "Warning";
-            } else {
-                trend = "Weak";
-                patternStrength = "Low";
-                trigger = "Inactive";
+            // Remove oldest row if we exceed maxRows
+            if (tableBody.rows.length > maxRows) {
+                tableBody.deleteRow(maxRows);
             }
             
-            patternMatchEl.textContent = trend;
-            patternMatchEl.className = `signal-value ${trend === 'Strong' ? 'trend-up' : trend === 'Medium' ? 'trend-neutral' : 'trend-down'}`;
-            
-            patternStrengthEl.textContent = patternStrength;
-            patternStrengthEl.className = `signal-value ${patternStrength === 'High' ? 'trend-up' : patternStrength === 'Medium' ? 'trend-neutral' : 'trend-down'}`;
-            
-            triggerStatusEl.textContent = trigger;
-            triggerStatusEl.className = `signal-value ${trigger === 'Active' ? 'trend-up' : trigger === 'Inactive' ? 'trend-down' : 'trend-neutral'}`;
-            
-            // Update trigger message
-            if (trigger === 'Active') {
-                triggerMessageEl.textContent = "Pattern matched - Strong Entry Signal";
-                triggerMessageEl.className = "trigger-active";
-            } else if (trigger === 'Warning') {
-                triggerMessageEl.textContent = "Pattern matched only - Safe Entry";
-                triggerMessageEl.className = "trigger-warning";
-            } else {
-                triggerMessageEl.textContent = "No strong pattern - Avoid (Too risky)";
-                triggerMessageEl.className = "trigger-inactive";
-            }
-            
-            // Store prediction
-            predictionHistory.push(prediction);
-            if (predictionHistory.length > 10) predictionHistory.shift();
+            // Increment issue number
+            currentIssue++;
         }
         
-        // Analyze pattern for opposite behavior
-        function analyzePattern() {
-            if (predictionHistory.length < 3 || actualHistory.length < 3) return;
+        // User Panel Scripts
+        // Check login
+        const accessKey = localStorage.getItem('accessKey');
+        const expiresAt = localStorage.getItem('expiresAt');
+        
+        if (!accessKey || !expiresAt) {
+            window.location.href = "index.html";
+        }
+        
+        // Display key info
+        document.getElementById('displayKey').textContent = accessKey;
+        document.getElementById('displayExpiry').textContent = new Date(parseInt(expiresAt)).toLocaleString();
+        
+        // Countdown timer
+        function updateCountdown() {
+            const now = Date.now();
+            const remaining = parseInt(expiresAt) - now;
             
-            // Get last 3 predictions and actual outcomes
-            const lastPredictions = predictionHistory.slice(-3);
-            const lastActual = actualHistory.slice(-3);
-            
-            // Check for opposite pattern
-            let oppositeCount = 0;
-            for (let i = 0; i < lastPredictions.length; i++) {
-                if (lastPredictions[i] !== lastActual[i]) {
-                    oppositeCount++;
-                }
+            if (remaining <= 0) {
+                document.getElementById('countdown').textContent = "EXPIRED";
+                logout();
+                return;
             }
             
-            const isOppositePattern = oppositeCount >= 2; // 2 out of 3 matches
-            const patternStrength = Math.floor(Math.random() * 40) + 60; // 60-100%
+            const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((remaining % (1000 * 60)) / 1000);
             
-            // Update UI
-            prevPredictionsEl.textContent = lastPredictions.join(', ');
-            actualOutcomesEl.textContent = lastActual.join(', ');
-            patternConsistencyEl.textContent = `${patternStrength}%`;
-            
-            if (isOppositePattern) {
-                patternTypeResultEl.textContent = "OPPOSITE";
-                patternTypeResultEl.className = "analysis-result opposite";
-                
-                oppositePatternResultEl.textContent = "DETECTED";
-                oppositePatternResultEl.className = "analysis-result opposite";
-                
-                oppositeDetectedEl.textContent = "Yes (Strong Signal)";
-                oppositeDetectedEl.className = "opposite-pattern";
-                
-                patternStrengthValueEl.textContent = "High (87%)";
-                
-                // Predict next outcome as opposite of AI prediction
-                const nextPrediction = predictionHistory[predictionHistory.length - 1] === 'BIG' ? 'SMALL' : 'BIG';
-                nextPredictionEl.textContent = nextPrediction;
-                nextPredictionEl.className = nextPrediction === 'BIG' ? "big" : "small";
-            } else {
-                patternTypeResultEl.textContent = "CONFIRMED";
-                patternTypeResultEl.className = "analysis-result confirmed";
-                
-                oppositePatternResultEl.textContent = "NOT DETECTED";
-                oppositePatternResultEl.className = "analysis-result confirmed";
-                
-                oppositeDetectedEl.textContent = "No (Normal Pattern)";
-                oppositeDetectedEl.className = "confirmed-pattern";
-                
-                patternStrengthValueEl.textContent = "Medium (72%)";
-                
-                // Predict next outcome as same as AI prediction
-                const nextPrediction = predictionHistory[predictionHistory.length - 1];
-                nextPredictionEl.textContent = nextPrediction;
-                nextPredictionEl.className = nextPrediction === 'BIG' ? "big" : "small";
-            }
-            
-            // Render pattern sequence
-            renderPatternSequence(lastPredictions, lastActual);
+            document.getElementById('countdown').textContent = 
+                `${days}d ${hours}h ${mins}m ${secs}s`;
         }
         
-        // Render pattern sequence
-        function renderPatternSequence(predictions, actual) {
-            patternSequenceEl.innerHTML = '';
-            
-            // Add predictions
-            predictions.forEach((pred, index) => {
-                const item = document.createElement('div');
-                item.className = `pattern-item prediction ${pred === 'BIG' ? 'big' : 'small'}`;
-                item.textContent = pred.charAt(0);
-                patternSequenceEl.appendChild(item);
-                
-                // Add arrow
-                if (index < predictions.length - 1) {
-                    const arrow = document.createElement('div');
-                    arrow.className = 'pattern-item';
-                    arrow.innerHTML = '<i class="fas fa-arrow-right"></i>';
-                    patternSequenceEl.appendChild(arrow);
-                }
-            });
-            
-            // Add separator
-            const separator = document.createElement('div');
-            separator.className = 'pattern-item';
-            separator.innerHTML = '<i class="fas fa-long-arrow-alt-down"></i>';
-            separator.style.width = '100%';
-            separator.style.borderRadius = '5px';
-            separator.style.margin = '10px 0';
-            patternSequenceEl.appendChild(separator);
-            
-            // Add actual outcomes
-            actual.forEach((act, index) => {
-                const item = document.createElement('div');
-                item.className = `pattern-item ${act === 'BIG' ? 'big' : 'small'}`;
-                item.textContent = act.charAt(0);
-                patternSequenceEl.appendChild(item);
-                
-                // Add arrow
-                if (index < actual.length - 1) {
-                    const arrow = document.createElement('div');
-                    arrow.className = 'pattern-item';
-                    arrow.innerHTML = '<i class="fas fa-arrow-right"></i>';
-                    patternSequenceEl.appendChild(arrow);
-                }
-            });
-        }
+        // Update every second
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
         
-        // Mark as win
-        function markAsWin() {
-            winCount++;
-            currentStreak++;
-            if (currentStreak > bestStreak) bestStreak = currentStreak;
-            
-            // Update pattern accuracy
-            if (patterns.length > 0) {
-                // Find the most recently used pattern (for demo, we'll update the first pattern)
-                const pattern = patterns[0];
-                pattern.accuracy = Math.min(100, pattern.accuracy + 1);
-                pattern.streak = pattern.streak > 0 ? pattern.streak + 1 : 1;
-                pattern.usage++;
-                pattern.lastUsed = "Just now";
-                
-                // Re-render patterns
-                renderPatterns();
-            }
-            
-            updateStats();
+        // Logout
+        function logout() {
+            localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('accessKey');
+            localStorage.removeItem('expiresAt');
+            window.location.href = "index.html";
         }
-        
-        // Mark as loss
-        function markAsLoss() {
-            lossCount++;
-            currentStreak = 0;
-            
-            // Update pattern accuracy
-            if (patterns.length > 0) {
-                // Find the most recently used pattern (for demo, we'll update the first pattern)
-                const pattern = patterns[0];
-                pattern.accuracy = Math.max(0, pattern.accuracy - 2);
-                pattern.streak = pattern.streak > 0 ? -1 : pattern.streak - 1;
-                pattern.usage++;
-                pattern.lastUsed = "Just now";
-                
-                // Re-render patterns
-                renderPatterns();
-            }
-            
-            updateStats();
-        }
-        
-        // Update stats
-        function updateStats() {
-            const winRate = winCount + lossCount > 0 ? 
-                Math.round((winCount / (winCount + lossCount)) * 100) : 87.5;
-            successRateEl.textContent = `${winRate}%`;
-            
-            const patternAccuracy = Math.floor(Math.random() * 11) + 85; // 85-95%
-            patternAccuracyEl.textContent = `${patternAccuracy}%`;
-            
-            // Calculate opposite patterns percentage
-            let oppositeCount = 0;
-            if (predictionHistory.length > 0 && actualHistory.length > 0) {
-                for (let i = 0; i < Math.min(predictionHistory.length, actualHistory.length); i++) {
-                    if (predictionHistory[i] !== actualHistory[i]) {
-                        oppositeCount++;
-                    }
-                }
-                const oppositePercentage = Math.round((oppositeCount / predictionHistory.length) * 100);
-                document.getElementById('opposite-patterns').textContent = `${oppositePercentage}%`;
-            }
-        }
-        
-        // Start live timer
-        function startLiveTimer() {
-            updateLiveTimer();
-        }
-        
-        // Live market timer
-        function updateLiveTimer() {
-            const now = new Date();
-            const base = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 5, 30, 0);
-            if (now < base) base.setDate(base.getDate() - 1);
-            const elapsed = Math.floor((now - base) / 1000);
-            const remain = 30 - (elapsed % 30);
-            
-            const formatted = `00:${String(remain).padStart(2, '0')}`;
-            countdownEl.textContent = formatted;
-            marketTimerEl.textContent = formatted;
-            
-            if (remain === 30) {
-                fetchAndUpdate();
-            }
-            setTimeout(updateLiveTimer, 1000);
-        }
-        
-        // Initialize the app
-        window.onload = init;
     </script>
 </body>
 </html>
