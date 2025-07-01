@@ -3,304 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Hack - User Panel</title>
+    <title>Meal99999999999</title>
     <style>
+        :root {
+            --primary-color: #4285F4;
+            --secondary-color: #34A853;
+            --danger-color: #EA4335;
+            --warning-color: #FBBC05;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #333333;
+            --text-dark: #202124;
+            --text-light: #5f6368;
+        }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #0d1117;
-            color: #fff;
-            background-image: radial-gradient(circle at 75% 25%, rgba(33, 150, 243, 0.1) 0%, transparent 50%);
-        }
-        
-        /* Dark Hack Styles */
-        .dark-hack-container {
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
             max-width: 800px;
-            margin: 20px auto;
+            margin: 0 auto;
             padding: 20px;
+            background-color: var(--light-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .header {
             text-align: center;
-        }
-        
-        .header-section {
-            position: relative;
             margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
         
-        .header-section h1 {
-            font-size: 2.2rem;
-            background: linear-gradient(90deg, #4CAF50, #2196F3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            margin-bottom: 15px;
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 500;
+            color: var(--primary-color);
         }
         
-        .header-section::after {
-            content: "";
-            display: block;
-            width: 100px;
-            height: 3px;
-            background: linear-gradient(90deg, #4CAF50, #2196F3);
-            margin: 10px auto;
-            border-radius: 3px;
+        .current-period {
+            font-size: 1rem;
+            margin-top: 10px;
+            color: var(--text-light);
         }
         
-        .telegram-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #0088cc, #2aabee);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: bold;
-            margin: 15px 0;
-            transition: all 0.3s;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            border: none;
-            cursor: pointer;
-        }
-        
-        .telegram-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-            background: linear-gradient(135deg, #0077b5, #2298db);
-        }
-        
-        .telegram-btn i {
-            margin-right: 8px;
-        }
-        
-        .container {
+        .main-container {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             gap: 20px;
-            margin-bottom: 20px;
         }
         
         .input-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
         
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px auto;
-            background-color: #1a1f27;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        
-        th, td {
-            border: 1px solid #444;
-            padding: 10px;
-            text-align: center;
-            color: #fff;
-        }
-        
-        th {
-            background-color: #2d3748;
-            font-weight: 600;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #212835;
-        }
-        
-        .number-buttons {
+        .number-pad {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 10px;
             margin-top: 15px;
-            width: 100%;
-            max-width: 300px;
         }
         
         .number-btn {
             padding: 12px 0;
-            background-color: #4CAF50;
-            color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
             cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+            background-color: var(--primary-color);
+            color: white;
         }
         
         .number-btn:hover {
-            background-color: #45a049;
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
         
-        .prediction-container {
+        .number-btn:active {
+            transform: translateY(0);
+        }
+        
+        .prediction-card {
             margin-top: 20px;
-            padding: 20px;
-            background: linear-gradient(135deg, #2d3748, #1a1f27);
-            border-radius: 12px;
-            display: none;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-            border: 1px solid #444;
-            animation: fadeIn 0.5s ease-out;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--medium-gray);
+            min-height: 80px;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .prediction-text {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--text-light);
         }
         
         .prediction-value {
-            font-size: 32px;
-            font-weight: bold;
-            margin: 10px 0;
-            animation: pulse 2s infinite;
+            font-size: 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        .prediction-big {
-            color: #4CAF50;
-            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
-        }
-        
-        .prediction-small {
-            color: #f44336;
-            text-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
-        }
-        
-        .confidence {
-            font-size: 16px;
-            color: #aaa;
-            margin: 5px 0;
-        }
-        
-        .wait-message {
-            font-size: 18px;
-            color: #2196F3;
-            margin: 10px 0;
-            font-style: italic;
-            animation: blink 1.5s infinite;
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
-        
-        /* User Panel Styles */
-        .user-panel-container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #1a1f27;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        
-        .card {
-            background: #212835;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #444;
-        }
-        
-        .key-display {
-            font-family: monospace;
-            background: #2d3748;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-            color: #fff;
-            border: 1px solid #444;
-        }
-        
-        .timer {
-            font-size: 24px;
-            text-align: center;
+        .history-graph {
+            height: 100px;
             margin: 20px 0;
-            color: #fff;
+            background-color: white;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--medium-gray);
         }
         
-        .btn {
-            padding: 10px 15px;
-            background: #1877f2;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            display: block;
+        .history-bar {
+            position: absolute;
+            bottom: 0;
+            width: 12px;
+            background-color: var(--primary-color);
+            margin-right: 2px;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            transition: height 0.3s ease;
+        }
+        
+        .S { background-color: var(--danger-color); }
+        .B { background-color: var(--secondary-color); }
+        
+        .results-table {
             width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--medium-gray);
+        }
+        
+        .results-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .results-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .B-cell {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+        
+        .S-cell {
+            color: var(--danger-color);
+            font-weight: 500;
+        }
+        
+        .status-message {
+            padding: 10px;
             margin-top: 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            text-align: center;
         }
         
-        .btn:hover {
-            background: #166fe5;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        .analyzing {
+            background-color: var(--warning-color);
+            color: var(--dark-gray);
         }
         
-        .btn-danger {
-            background: #e74c3c;
+        .ready {
+            background-color: var(--secondary-color);
+            color: white;
         }
         
-        .btn-danger:hover {
-            background: #c0392b;
+        .error {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .countdown {
+            font-size: 1rem;
+            color: var(--warning-color);
+            font-weight: bold;
+        }
+        
+        .strategy-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--medium-gray);
+        }
+        
+        .strategy-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .strategy-desc {
+            color: var(--text-light);
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
-    <!-- Dark Hack Section -->
-    <div class="dark-hack-container">
-        <div class="header-section">
-            <h1>Dark Hack</h1>
-            <a href="https://t.me/dark67hack" class="telegram-btn" target="_blank">
-                <i class="fab fa-telegram"></i> Join Telegram
-            </a>
-        </div>
-        
-        <div class="container">
-            <div class="input-section">
-                <div class="number-buttons">
-                    <button class="number-btn" onclick="addNumber(0)">0</button>
-                    <button class="number-btn" onclick="addNumber(1)">1</button>
-                    <button class="number-btn" onclick="addNumber(2)">2</button>
-                    <button class="number-btn" onclick="addNumber(3)">3</button>
-                    <button class="number-btn" onclick="addNumber(4)">4</button>
-                    <button class="number-btn" onclick="addNumber(5)">5</button>
-                    <button class="number-btn" onclick="addNumber(6)">6</button>
-                    <button class="number-btn" onclick="addNumber(7)">7</button>
-                    <button class="number-btn" onclick="addNumber(8)">8</button>
-                    <button class="number-btn" onclick="addNumber(9)">9</button>
-                </div>
+    <div class="header">
+        <h1>dark hack</h1>
+        <div class="current-period">owner:<span id="currentPeriod">@Md_NAyeem_vip_hack</span></div>
+    </div>
+    
+    <div class="main-container">
+        <div class="input-section">
+            <div class="number-pad">
+                <button class="number-btn" onclick="addNumber(0)">0</button>
+                <button class="number-btn" onclick="addNumber(1)">1</button>
+                <button class="number-btn" onclick="addNumber(2)">2</button>
+                <button class="number-btn" onclick="addNumber(3)">3</button>
+                <button class="number-btn" onclick="addNumber(4)">4</button>
+                <button class="number-btn" onclick="addNumber(5)">5</button>
+                <button class="number-btn" onclick="addNumber(6)">6</button>
+                <button class="number-btn" onclick="addNumber(7)">7</button>
+                <button class="number-btn" onclick="addNumber(8)">8</button>
+                <button class="number-btn" onclick="addNumber(9)">9</button>
+            </div>
+            
+            <div class="prediction-card" id="prediction">
+                <div class="prediction-text"></div>
+                <div class="prediction-value" id="predictionValue">-</div>
+                <div id="countdown" class="countdown"></div>
+            </div>
+            
+            <div id="statusMessage" class="status-message analyzing">Waiting for data...</div>
+            
+            <div class="strategy-info" id="strategyInfo" style="display: none;">
+                <div class="strategy-title" id="strategyTitle">Strategy Applied</div>
+                <div class="strategy-desc" id="strategyDesc">Description of the strategy being used</div>
             </div>
         </div>
         
-        <div id="waitMessage" class="wait-message" style="display: none;">Please wait while analyzing...</div>
+        <div class="history-graph" id="historyGraph"></div>
         
-        <div id="predictionContainer" class="prediction-container">
-            <h3>Next Prediction</h3>
-            <div id="predictionValue" class="prediction-value"></div>
-            <div id="predictionConfidence" class="confidence"></div>
-        </div>
-        
-        <table id="resultsTable">
+        <table class="results-table">
             <thead>
                 <tr>
                     <th>Issue</th>
                     <th>Number</th>
-                    <th>B/S</th>
+                    <th>Result</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -308,195 +278,34 @@
             </tbody>
         </table>
     </div>
-    
-    <!-- User Panel Section -->
-    <div class="user-panel-container">
-        <div class="card">
-            <h2>Your Access</h2>
-            <div class="key-display">
-                <strong>Key:</strong> <span id="displayKey"></span><br>
-                <strong>Expires:</strong> <span id="displayExpiry"></span>
-            </div>
-            
-            <div class="timer">
-                <p>Time Remaining:</p>
-                <div id="countdown"></div>
-            </div>
-            
-            <button class="btn btn-danger" onclick="logout()">Logout</button>
-        </div>
-    </div>
 
     <script>
-        // Dark Hack Scripts
         let currentIssue = 1;
+        const currentPeriod = 1000;
         const maxRows = 10;
-        let gameHistory = [];
+        let history = [];
+        let countdownInterval;
         
-        function analyzePatterns(numbers) {
-            const strategies = [];
-            
-            // Strategy 1: Check for repeating numbers or small range
-            const lastNumber = numbers[0];
-            const isRepeating = numbers.slice(0, 3).every(n => n === lastNumber);
-            if (isRepeating) {
-                strategies.push({
-                    prediction: lastNumber <= 4 ? 'B' : 'S',
-                    confidence: 70 + Math.floor(Math.random() * 10),
-                    strategy: "Repeating number pattern detected"
-                });
-            }
-            
-            // Strategy 2: Opposite after multiple repeats
-            const recentNumbers = numbers.slice(0, 5);
-            const countRecent = recentNumbers.filter(n => n === lastNumber).length;
-            if (countRecent >= 3) {
-                strategies.push({
-                    prediction: lastNumber <= 4 ? 'B' : 'S',
-                    confidence: 75 + Math.floor(Math.random() * 10),
-                    strategy: "Opposite after multiple repeats"
-                });
-            }
-            
-            // Strategy 3: After 5 small numbers, expect big
-            const lastFiveSmall = numbers.slice(0, 5).every(n => n <= 4);
-            if (lastFiveSmall) {
-                strategies.push({
-                    prediction: 'B',
-                    confidence: 80 + Math.floor(Math.random() * 10),
-                    strategy: "After 5 consecutive small numbers"
-                });
-            }
-            
-            // Strategy 4: Last digit 7 or 9 predicts small
-            const lastDigit = lastNumber % 10;
-            if (lastDigit === 7 || lastDigit === 9) {
-                strategies.push({
-                    prediction: 'S',
-                    confidence: 65 + Math.floor(Math.random() * 10),
-                    strategy: "Last digit 7 or 9 pattern"
-                });
-            }
-            
-            // Strategy 5: Double numbers predict small
-            if (numbers[0] === numbers[1]) {
-                strategies.push({
-                    prediction: 'S',
-                    confidence: 60 + Math.floor(Math.random() * 10),
-                    strategy: "Double numbers pattern"
-                });
-            }
-            
-            // Strategy 6: Extreme numbers (1 and 9) predict small
-            if (numbers.some(n => n === 1) && numbers.some(n => n === 9)) {
-                strategies.push({
-                    prediction: 'S',
-                    confidence: 55 + Math.floor(Math.random() * 10),
-                    strategy: "Extreme numbers present"
-                });
-            }
-            
-            // Strategy 7: After 3 even numbers, expect odd (small)
-            const lastThreeEven = numbers.slice(0, 3).every(n => n % 2 === 0);
-            if (lastThreeEven) {
-                strategies.push({
-                    prediction: 'S',
-                    confidence: 70 + Math.floor(Math.random() * 10),
-                    strategy: "After 3 even numbers"
-                });
-            }
-            
-            // Strategy 8: Sum of last two > 10 predicts big
-            if (numbers.length >= 2) {
-                const sumLastTwo = numbers[0] + numbers[1];
-                if (sumLastTwo > 10) {
-                    strategies.push({
-                        prediction: 'B',
-                        confidence: 65 + Math.floor(Math.random() * 10),
-                        strategy: "Sum of last two numbers > 10"
-                    });
-                }
-            }
-            
-            // Strategy 9: After 0 or 1, expect big jump
-            if (numbers[0] === 0 || numbers[0] === 1) {
-                strategies.push({
-                    prediction: 'B',
-                    confidence: 75 + Math.floor(Math.random() * 10),
-                    strategy: "After 0 or 1 pattern"
-                });
-            }
-            
-            // Strategy 10: After 5 same numbers, expect break
-            const allSame = numbers.slice(0, 5).every(n => n === numbers[0]);
-            if (allSame) {
-                strategies.push({
-                    prediction: numbers[0] <= 4 ? 'B' : 'S',
-                    confidence: 85 + Math.floor(Math.random() * 10),
-                    strategy: "Break after 5 same numbers"
-                });
-            }
-            
-            // If no strategies matched, use basic probability
-            if (strategies.length === 0) {
-                const smallCount = numbers.filter(n => n <= 4).length;
-                const bigCount = numbers.filter(n => n > 4).length;
-                
-                strategies.push({
-                    prediction: smallCount > bigCount ? 'B' : 'S',
-                    confidence: 50 + Math.floor(Math.random() * 10),
-                    strategy: "Basic probability analysis"
-                });
-            }
-            
-            // Find the strategy with highest confidence
-            let bestStrategy = strategies[0];
-            for (const strategy of strategies) {
-                if (strategy.confidence > bestStrategy.confidence) {
-                    bestStrategy = strategy;
-                }
-            }
-            
-            return bestStrategy;
-        }
-
-        function updatePrediction() {
-            if (gameHistory.length < 5) return;
-            
-            // Show wait message
-            const waitMessage = document.getElementById('waitMessage');
-            waitMessage.style.display = 'block';
-            
-            // Hide prediction container while analyzing
-            const predictionContainer = document.getElementById('predictionContainer');
-            predictionContainer.style.display = 'none';
-            
-            // Simulate analysis delay
-            setTimeout(() => {
-                const prediction = analyzePatterns(gameHistory);
-                const predictionValue = document.getElementById('predictionValue');
-                const predictionConfidence = document.getElementById('predictionConfidence');
-                
-                // Hide wait message
-                waitMessage.style.display = 'none';
-                
-                // Show prediction
-                predictionValue.textContent = prediction.prediction;
-                predictionValue.className = `prediction-value ${prediction.prediction === 'B' ? 'prediction-big' : 'prediction-small'}`;
-                predictionConfidence.textContent = `${prediction.confidence}% confidence`;
-                predictionContainer.style.display = 'block';
-                
-                // Add animation
-                predictionContainer.style.animation = 'none';
-                void predictionContainer.offsetWidth; // Trigger reflow
-                predictionContainer.style.animation = 'fadeIn 0.5s ease-out';
-                
-            }, 3000); // 3 second delay for analysis
-        }
-
         function addNumber(number) {
+            // Immediately process the number (add to table and history)
+            processNumberImmediately(number);
+            
+            // Start the 3-second countdown for prediction
+            startCountdown();
+            
+            // Analyze and show prediction after 3 seconds
+            setTimeout(() => {
+                showPrediction(number);
+            }, 3000);
+        }
+        
+        function processNumberImmediately(number) {
             // Determine B/S
             const result = (number <= 4) ? 'S' : 'B';
+            
+            // Add to history
+            history.push({number, result, issue: currentIssue});
+            if (history.length > 20) history.shift();
             
             // Add to table
             const tableBody = document.getElementById('tableBody');
@@ -504,70 +313,491 @@
             
             newRow.insertCell(0).textContent = currentIssue;
             newRow.insertCell(1).textContent = number;
-            newRow.insertCell(2).textContent = result;
-            
-            // Add to game history for prediction
-            gameHistory.unshift(number);
-            if (gameHistory.length > 10) {
-                gameHistory.pop();
-            }
-            
-            // Update prediction
-            updatePrediction();
+            const resultCell = newRow.insertCell(2);
+            resultCell.textContent = result;
+            resultCell.className = result + '-cell';
             
             // Remove oldest row if we exceed maxRows
             if (tableBody.rows.length > maxRows) {
                 tableBody.deleteRow(maxRows);
             }
             
+            // Update history graph immediately
+            updateHistoryGraph();
+            
             // Increment issue number
             currentIssue++;
         }
         
-        // User Panel Scripts
-        // Check login
-        const accessKey = localStorage.getItem('accessKey');
-        const expiresAt = localStorage.getItem('expiresAt');
-        
-        if (!accessKey || !expiresAt) {
-            window.location.href = "index.html";
+        function startCountdown() {
+            let seconds = 3;
+            const countdownElement = document.getElementById('countdown');
+            const predictionValue = document.getElementById('predictionValue');
+            
+            // Clear previous countdown if any
+            clearInterval(countdownInterval);
+            
+            // Reset prediction display
+            predictionValue.textContent = '-';
+            predictionValue.style.color = 'inherit';
+            
+            // Hide strategy info
+            document.getElementById('strategyInfo').style.display = 'none';
+            
+            // Show initial countdown
+            countdownElement.textContent = `Prediction in ${seconds}...`;
+            
+            // Start countdown
+            countdownInterval = setInterval(() => {
+                seconds--;
+                countdownElement.textContent = `Prediction in ${seconds}...`;
+                
+                if (seconds <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.textContent = '';
+                }
+            }, 1000);
         }
         
-        // Display key info
-        document.getElementById('displayKey').textContent = accessKey;
-        document.getElementById('displayExpiry').textContent = new Date(parseInt(expiresAt)).toLocaleString();
-        
-        // Countdown timer
-        function updateCountdown() {
-            const now = Date.now();
-            const remaining = parseInt(expiresAt) - now;
+        function showPrediction(currentNumber) {
+            const predictionValue = document.getElementById('predictionValue');
+            const statusElement = document.getElementById('statusMessage');
+            const strategyInfo = document.getElementById('strategyInfo');
+            const strategyTitle = document.getElementById('strategyTitle');
+            const strategyDesc = document.getElementById('strategyDesc');
             
-            if (remaining <= 0) {
-                document.getElementById('countdown').textContent = "EXPIRED";
-                logout();
+            if (history.length < 3) {
+                predictionValue.textContent = '-';
+                statusElement.textContent = "Collecting more data...";
+                statusElement.className = "status-message analyzing";
                 return;
             }
             
-            const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((remaining % (1000 * 60)) / 1000);
+            const currentResult = (currentNumber <= 4) ? 'S' : 'B';
+            const lastEntry = history[history.length - 2]; // previous entry
+            const secondLastEntry = history[history.length - 3]; // second last entry
+            let prediction = null;
+            let strategyText = "";
+            let strategyDetails = "";
             
-            document.getElementById('countdown').textContent = 
-                `${days}d ${hours}h ${mins}m ${secs}s`;
+            // Convert number to digits array for pattern detection
+            const digits = String(currentNumber).split('').map(Number);
+            
+            // Strategy 1: Three Small in a row
+            if (checkStreak('S') >= 3) {
+                prediction = 'B';
+                strategyText = "Three Small streak detected";
+                strategyDetails = "After three Small results in a row, predicting Big (Strategy 2)";
+            }
+            // Strategy 2: Contains 8 or 9
+            else if (digits.includes(8) || digits.includes(9)) {
+                prediction = 'S';
+                strategyText = "Number contains 8 or 9";
+                strategyDetails = "When number contains 8 or 9, predicting Small (Strategy 3)";
+            }
+            // Strategy 3: Long streak break (4-5 same results)
+            else if (checkStreak('S') >= 4) {
+                prediction = 'B';
+                strategyText = "Long Small streak detected";
+                strategyDetails = "After 4-5 Small results, predicting Big (Strategy 4)";
+            }
+            else if (checkStreak('B') >= 4) {
+                prediction = 'S';
+                strategyText = "Long Big streak detected";
+                strategyDetails = "After 4-5 Big results, predicting Small (Strategy 4)";
+            }
+            // Strategy 4: Contains 0
+            else if (digits.includes(0)) {
+                prediction = 'S';
+                strategyText = "Number contains 0";
+                strategyDetails = "When number contains 0, predicting Small (Strategy 5)";
+            }
+            // Strategy 5: Middle digit is small (1-2-3)
+            else if (digits.length >= 3 && digits[1] <= 3) {
+                prediction = 'S';
+                strategyText = "Middle digit is small";
+                strategyDetails = "When middle digit is 1-2-3, predicting Small (Strategy 6)";
+            }
+            // Strategy 6: Pattern repetition
+            else if (history.length >= 3 && 
+                     lastEntry.result === secondLastEntry.result && 
+                     lastEntry.result !== currentResult) {
+                prediction = lastEntry.result;
+                strategyText = "Pattern repetition detected";
+                strategyDetails = "When pattern repeats (like B-S-B), predicting same (Strategy 7)";
+            }
+            // Strategy 7: Stair pattern (3-4-5 or 6-7-8)
+            else if (history.length >= 3 && 
+                     Math.abs(lastEntry.number - secondLastEntry.number) === 1 && 
+                     Math.abs(currentNumber - lastEntry.number) === 1) {
+                prediction = 'S';
+                strategyText = "Stair pattern detected";
+                strategyDetails = "When stair pattern (like 3-4-5), predicting Small (Strategy 8)";
+            }
+            // Strategy 8: Contains 5
+            else if (digits.includes(5)) {
+                prediction = 'B';
+                strategyText = "Number contains 5";
+                strategyDetails = "When number contains 5, predicting Big (Strategy 9)";
+            }
+            // Strategy 9: Sum of digits >= 15 (for 3-digit numbers)
+            else if (digits.length >= 3 && digits.reduce((a,b) => a + b, 0) >= 15) {
+                prediction = 'B';
+                strategyText = "High digit sum";
+                strategyDetails = "When sum of digits >= 15, predicting Big (Strategy 10)";
+            }
+            // Strategy 10: Single digit repeats three times
+            else if (history.length >= 3 && 
+                     lastEntry.number === secondLastEntry.number && 
+                     lastEntry.number === currentNumber) {
+                prediction = currentResult === 'S' ? 'B' : 'S';
+                strategyText = "Triple repeat detected";
+                strategyDetails = "When same number appears three times, predicting opposite (Strategy 11)";
+            }
+            // Strategy 11: Ends with 1 or 2
+            else if (digits[digits.length - 1] === 1 || digits[digits.length - 1] === 2) {
+                prediction = 'B';
+                strategyText = "Ends with 1 or 2";
+                strategyDetails = "When number ends with 1 or 2, predicting Big (Strategy 12)";
+            }
+            // Strategy 12: Middle digit is 7 or 8
+            else if (digits.length >= 3 && (digits[1] === 7 || digits[1] === 8)) {
+                prediction = 'S';
+                strategyText = "Middle digit is 7 or 8";
+                strategyDetails = "When middle digit is 7 or 8, predicting Small (Strategy 13)";
+            }
+            // Strategy 13: All digits even
+            else if (digits.every(d => d % 2 === 0)) {
+                prediction = 'S';
+                strategyText = "All digits even";
+                strategyDetails = "When all digits are even, predicting Small (Strategy 14)";
+            }
+            // Strategy 14: Results under 4 in a row
+            else if (history.length >= 3 && 
+                     lastEntry.number <= 4 && 
+                     secondLastEntry.number <= 4 && 
+                     currentNumber <= 4) {
+                prediction = 'B';
+                strategyText = "Consecutive low numbers";
+                strategyDetails = "After consecutive numbers <=4, predicting Big (Strategy 15)";
+            }
+            // Strategy 15: Big streak of 7
+            else if (checkStreak('B') >= 7) {
+                prediction = 'S';
+                strategyText = "Big streak of 7";
+                strategyDetails = "After 7 Big results, predicting Small (Strategy 16)";
+            }
+            // Strategy 16: Contains 7,8,9 together
+            else if ((digits.includes(7) && digits.includes(8)) || 
+                     (digits.includes(7) && digits.includes(9)) || 
+                     (digits.includes(8) && digits.includes(9))) {
+                prediction = currentResult === 'S' ? 'B' : 'S';
+                strategyText = "Contains high digits together";
+                strategyDetails = "When 7,8,9 appear together, predicting opposite (Strategy 17)";
+            }
+            // Strategy 17: All digits same (like 555)
+            else if (new Set(digits).size === 1) {
+                prediction = 'S';
+                strategyText = "All digits identical";
+                strategyDetails = "When all digits are same, predicting Small (Strategy 18)";
+            }
+            // Strategy 18: First digit small, last digit big
+            else if (digits.length >= 3 && digits[0] <= 3 && digits[digits.length - 1] >= 7) {
+                prediction = 'B';
+                strategyText = "First small, last big";
+                strategyDetails = "When first digit small and last digit big, predicting Big (Strategy 19)";
+            }
+            // Strategy 19: Contains both 0 and 9
+            else if (digits.includes(0) && digits.includes(9)) {
+                prediction = 'S';
+                strategyText = "Contains 0 and 9";
+                strategyDetails = "When number contains both 0 and 9, predicting Small (Strategy 20)";
+            }
+            // Strategy 20: All digits between 2-5
+            else if (digits.every(d => d >= 2 && d <= 5)) {
+                prediction = currentResult;
+                strategyText = "All digits 2-5";
+                strategyDetails = "When all digits between 2-5, predicting same trend continues (Strategy 21)";
+            }
+            // Strategy 21: Same number appears multiple times in market
+            else if (history.filter(h => h.number === currentNumber).length >= 2) {
+                prediction = currentResult === 'S' ? 'B' : 'S';
+                strategyText = "Number repeating in market";
+                strategyDetails = "When same number appears multiple times, predicting opposite (Strategy 22)";
+            }
+            // Strategy 22: Stair pattern (like 234 or 678)
+            else if (digits.length >= 3 && 
+                     digits[0] + 1 === digits[1] && 
+                     digits[1] + 1 === digits[2]) {
+                prediction = 'S';
+                strategyText = "Three-digit stair pattern";
+                strategyDetails = "When three-digit stair pattern, predicting Small (Strategy 23)";
+            }
+            // Strategy 23: Middle digit is 5 or 6
+            else if (digits.length >= 3 && (digits[1] === 5 || digits[1] === 6)) {
+                prediction = 'B';
+                strategyText = "Middle digit is 5 or 6";
+                strategyDetails = "When middle digit is 5 or 6, predicting Big (Strategy 24)";
+            }
+            // Strategy 24: Big-Small-Big pattern
+            else if (history.length >= 3 && 
+                     secondLastEntry.result === 'B' && 
+                     lastEntry.result === 'S' && 
+                     currentResult === 'B') {
+                prediction = 'B';
+                strategyText = "Big-Small-Big pattern";
+                strategyDetails = "After Big-Small-Big, predicting Big again (Strategy 25)";
+            }
+            // Strategy 25: Ends with 6
+            else if (digits[digits.length - 1] === 6) {
+                prediction = 'S';
+                strategyText = "Ends with 6";
+                strategyDetails = "When number ends with 6, predicting Small (Strategy 26)";
+            }
+            // Strategy 26: Multiple zeros in market
+            else if (history.filter(h => String(h.number).includes('0')).length >= 3) {
+                prediction = 'B';
+                strategyText = "Multiple zeros in market";
+                strategyDetails = "When multiple zeros appear, predicting Big (Strategy 27)";
+            }
+            // Strategy 27: All digits odd
+            else if (digits.every(d => d % 2 !== 0)) {
+                prediction = 'S';
+                strategyText = "All digits odd";
+                strategyDetails = "When all digits are odd, predicting Small (Strategy 28)";
+            }
+            // Strategy 28: Number like 193 or 109
+            else if ((digits.length === 3 && digits[0] === 1 && digits[2] === 3) || 
+                     (digits.length === 3 && digits[0] === 1 && digits[1] === 0 && digits[2] === 9)) {
+                prediction = 'S';
+                strategyText = "Special pattern (193/109)";
+                strategyDetails = "When number matches special patterns, predicting Small (Strategy 29)";
+            }
+            // Strategy 29: Small streak of 4
+            else if (checkStreak('S') >= 4) {
+                prediction = 'B';
+                strategyText = "Small streak of 4";
+                strategyDetails = "After 4 Small results, predicting Big (Strategy 30)";
+            }
+            // Strategy 30: Palindrome number (like 343)
+            else if (digits.length >= 3 && digits[0] === digits[digits.length - 1]) {
+                prediction = currentResult === 'S' ? 'B' : 'S';
+                strategyText = "Palindrome number";
+                strategyDetails = "When palindrome number appears, predicting opposite (Strategy 31)";
+            }
+            // Strategy 31: Middle digit repeating
+            else if (digits.length >= 3 && 
+                     history.filter(h => String(h.number).length >= 3 && 
+                     String(h.number)[1] === String(currentNumber)[1]).length >= 2) {
+                prediction = currentResult === 'S' ? 'B' : 'S';
+                strategyText = "Middle digit repeating";
+                strategyDetails = "When middle digit repeats, predicting opposite (Strategy 32)";
+            }
+            // Strategy 32: Pattern like 1-0-1
+            else if (history.length >= 3 && 
+                     secondLastEntry.number === 1 && 
+                     lastEntry.number === 0 && 
+                     currentNumber === 1) {
+                prediction = 'B';
+                strategyText = "1-0-1 pattern";
+                strategyDetails = "After 1-0-1 pattern, predicting Big (Strategy 33)";
+            }
+            // Strategy 33: Last two digits same (like 44, 55)
+            else if (digits.length >= 2 && digits[digits.length - 1] === digits[digits.length - 2]) {
+                prediction = 'S';
+                strategyText = "Last two digits same";
+                strategyDetails = "When last two digits same, predicting Small (Strategy 34)";
+            }
+            // Strategy 34: Contains both 8 and 1
+            else if (digits.includes(8) && digits.includes(1)) {
+                prediction = currentResult === 'S' ? 'B' : 'S';
+                strategyText = "Contains 8 and 1";
+                strategyDetails = "When number contains both 8 and 1, predicting opposite (Strategy 35)";
+            }
+            // Strategy 35: Even-odd mix
+            else if (digits.some(d => d % 2 === 0) && digits.some(d => d % 2 !== 0)) {
+                prediction = 'S';
+                strategyText = "Even-odd mix";
+                strategyDetails = "When even and odd digits mix, predicting Small (Strategy 36)";
+            }
+            // Strategy 36: Large digit difference (for 3-digit numbers)
+            else if (digits.length >= 3 && Math.max(...digits) - Math.min(...digits) >= 7) {
+                prediction = currentResult === 'S' ? 'B' : 'S';
+                strategyText = "Large digit spread";
+                strategyDetails = "When digits have large difference, predicting opposite (Strategy 37)";
+            }
+            // Strategy 37: Middle digit is highest
+            else if (digits.length >= 3 && digits[1] > digits[0] && digits[1] > digits[2]) {
+                prediction = 'S';
+                strategyText = "Middle digit highest";
+                strategyDetails = "When middle digit is highest, predicting Small (Strategy 38)";
+            }
+            // Strategy 38: Contains 5,7,9
+            else if (digits.includes(5) && digits.includes(7) && digits.includes(9)) {
+                prediction = 'B';
+                strategyText = "Contains 5,7,9";
+                strategyDetails = "When number contains 5,7,9, predicting Big (Strategy 39)";
+            }
+            // Strategy 39: Ends with 2 on both sides
+            else if (digits.length >= 3 && digits[0] === 2 && digits[digits.length - 1] === 2) {
+                prediction = 'B';
+                strategyText = "Starts and ends with 2";
+                strategyDetails = "When number starts and ends with 2, predicting Big (Strategy 40)";
+            }
+            // Strategy 40: Contains three 9s
+            else if (digits.filter(d => d === 9).length >= 3) {
+                prediction = 'S';
+                strategyText = "Multiple 9s";
+                strategyDetails = "When number contains multiple 9s, predicting Small (Strategy 41)";
+            }
+            // Strategy 41: Contains two 6s
+            else if (digits.filter(d => d === 6).length >= 2) {
+                prediction = 'S';
+                strategyText = "Multiple 6s";
+                strategyDetails = "When number contains multiple 6s, predicting Small (Strategy 42)";
+            }
+            // Strategy 42: Big followed by 0
+            else if (lastEntry.result === 'B' && currentNumber === 0) {
+                prediction = 'S';
+                strategyText = "Big followed by 0";
+                strategyDetails = "When Big is followed by 0, predicting Small (Strategy 43)";
+            }
+            // Strategy 43: Stair pattern (like 345 or 678)
+            else if (digits.length >= 3 && 
+                     digits[0] + 1 === digits[1] && 
+                     digits[1] + 1 === digits[2]) {
+                prediction = 'S';
+                strategyText = "Three-digit stair pattern";
+                strategyDetails = "When three-digit stair pattern, predicting Small (Strategy 44)";
+            }
+            // Strategy 44: Same digit appears four times
+            else if (digits.length >= 3 && 
+                     new Set(digits).size === 1 && 
+                     history.filter(h => String(h.number)[0] === String(currentNumber)[0]).length >= 3) {
+                prediction = currentResult === 'S' ? 'B' : 'S';
+                strategyText = "Digit repeating in market";
+                strategyDetails = "When digit appears multiple times, predicting opposite (Strategy 45)";
+            }
+            // Strategy 45: Number like 010
+            else if (digits.length === 3 && digits[0] === 0 && digits[1] === 1 && digits[2] === 0) {
+                prediction = 'B';
+                strategyText = "010 pattern";
+                strategyDetails = "After 010 pattern, predicting Big (Strategy 46)";
+            }
+            // Strategy 46: Sequence like 77 then 88
+            else if (history.length >= 2 && 
+                     String(lastEntry.number).length === 2 && 
+                     String(lastEntry.number)[0] === String(lastEntry.number)[1] && 
+                     String(secondLastEntry.number).length === 2 && 
+                     String(secondLastEntry.number)[0] === String(secondLastEntry.number)[1] && 
+                     String(secondLastEntry.number)[0] === String(Number(String(lastEntry.number)[0]) - 1)) {
+                prediction = 'S';
+                strategyText = "77-88 sequence";
+                strategyDetails = "After sequence like 77 then 88, predicting Small (Strategy 47)";
+            }
+            // Strategy 47: Any digit repeats twice
+            else if (new Set(digits).size < digits.length) {
+                prediction = currentResult === 'S' ? 'B' : 'S';
+                strategyText = "Digit repeats in number";
+                strategyDetails = "When digit repeats in number, predicting opposite (Strategy 48)";
+            }
+            // Strategy 48: Ends with 2 multiple times
+            else if (digits[digits.length - 1] === 2 && 
+                     history.filter(h => String(h.number)[String(h.number).length - 1] === '2').length >= 2) {
+                prediction = 'B';
+                strategyText = "Ends with 2 multiple times";
+                strategyDetails = "When number ends with 2 multiple times, predicting Big (Strategy 49)";
+            }
+            // Strategy 49: Middle digit is 5 with small sides
+            else if (digits.length >= 3 && digits[1] === 5 && digits[0] <= 3 && digits[2] <= 3) {
+                prediction = 'S';
+                strategyText = "Middle 5 with small sides";
+                strategyDetails = "When middle digit is 5 with small sides, predicting Small (Strategy 50)";
+            }
+            // Fallback strategy based on recent distribution
+            else {
+                // Count recent S/B distribution
+                let sCount = 0, bCount = 0;
+                for (let i = Math.max(0, history.length - 5); i < history.length; i++) {
+                    if (history[i].result === 'S') sCount++;
+                    else bCount++;
+                }
+                
+                if (sCount > bCount + 2) {
+                    prediction = 'B';
+                    strategyText = "Recent Small bias";
+                    strategyDetails = "After multiple Small results, predicting Big (Fallback Strategy)";
+                } else if (bCount > sCount + 2) {
+                    prediction = 'S';
+                    strategyText = "Recent Big bias";
+                    strategyDetails = "After multiple Big results, predicting Small (Fallback Strategy)";
+                } else {
+                    strategyText = "No strong pattern detected";
+                    strategyDetails = "No clear prediction available based on current patterns";
+                    statusElement.textContent = "No clear prediction available";
+                    statusElement.className = "status-message error";
+                    predictionValue.textContent = '-';
+                    strategyInfo.style.display = 'none';
+                    return;
+                }
+            }
+            
+            if (prediction) {
+                predictionValue.textContent = prediction;
+                if (prediction === 'B') {
+                    predictionValue.style.color = 'var(--secondary-color)';
+                } else {
+                    predictionValue.style.color = 'var(--danger-color)';
+                }
+                
+                statusElement.textContent = "Prediction ready";
+                statusElement.className = "status-message ready";
+                
+                // Show strategy info
+                strategyTitle.textContent = strategyText;
+                strategyDesc.textContent = strategyDetails;
+                strategyInfo.style.display = 'block';
+            }
         }
         
-        // Update every second
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
+        function checkStreak(type) {
+            let streak = 0;
+            for (let i = history.length - 1; i >= 0; i--) {
+                if (history[i].result === type) streak++;
+                else break;
+            }
+            return streak;
+        }
         
-        // Logout
-        function logout() {
-            localStorage.removeItem('userLoggedIn');
-            localStorage.removeItem('accessKey');
-            localStorage.removeItem('expiresAt');
-            window.location.href = "index.html";
+        function checkEvenStreak() {
+            let streak = 0;
+            for (let i = history.length - 1; i >= 0; i--) {
+                if (history[i].number % 2 === 0) streak++;
+                else break;
+            }
+            return streak;
+        }
+        
+        function updateHistoryGraph() {
+            const graph = document.getElementById('historyGraph');
+            graph.innerHTML = '';
+            
+            const maxHeight = 100;
+            const itemWidth = 14;
+            const startPos = 10;
+            
+            // Only show last 20 results
+            const displayHistory = history.slice(-20);
+            
+            displayHistory.forEach((entry, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'history-bar ' + entry.result;
+                bar.style.height = (entry.number * 10) + 'px';
+                bar.style.left = (startPos + (index * (itemWidth + 2))) + 'px';
+                bar.title = '#' + entry.issue + ': ' + entry.number + ' (' + entry.result + ')';
+                graph.appendChild(bar);
+            });
         }
     </script>
 </body>
-</html>
+</html> 
