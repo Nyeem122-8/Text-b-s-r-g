@@ -245,6 +245,24 @@
             font-size: 1.2rem;
             margin-left: 5px;
         }
+        
+        .win-streak {
+            background-color: var(--green-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .loss-streak {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -269,7 +287,7 @@
             </div>
             
             <div class="prediction-card" id="prediction">
-                <div class="prediction-text">Next Prediction</div>
+                <div class="prediction-text">Next Prediction <span id="streakIndicator"></span></div>
                 <div class="prediction-value" id="predictionValue">-</div>
                 <div id="countdown" class="countdown"></div>
             </div>
@@ -287,10 +305,11 @@
         <table class="results-table">
             <thead>
                 <tr>
-                    <th>Issue</th>
                     <th>Number</th>
                     <th>Result</th>
                     <th>Color</th>
+                    <th>Prediction</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -305,6 +324,12 @@
         const maxRows = 10;
         let history = [];
         let countdownInterval;
+        let lastPrediction = null;
+        let lastPredictionType = null;
+        let winStreak = 0;
+        let lossStreak = 0;
+        let predictionHistory = [];
+        let lastActualResult = null;
         
         // Color patterns from the image
         const colorPatterns = [
@@ -344,6 +369,37 @@
             const result = (number <= 4) ? 'S' : 'B';
             const color = (number % 2 === 1) ? 'G' : 'R'; // Odd = Green (1,3,5,7,9), Even = Red (0,2,4,6,8)
             
+            // Check if last prediction was correct
+            if (lastPrediction !== null) {
+                let predictionCorrect = false;
+                
+                if (lastPredictionType === 'BS') {
+                    predictionCorrect = lastPrediction === result;
+                } else if (lastPredictionType === 'color') {
+                    predictionCorrect = lastPrediction === color;
+                }
+                
+                // Update streaks
+                if (predictionCorrect) {
+                    winStreak++;
+                    lossStreak = 0;
+                } else {
+                    lossStreak++;
+                    winStreak = 0;
+                }
+                
+                // Add to prediction history
+                predictionHistory.push({
+                    issue: currentIssue - 1,
+                    prediction: lastPrediction,
+                    actual: lastPredictionType === 'BS' ? result : color,
+                    correct: predictionCorrect
+                });
+            }
+            
+            // Store actual result for next prediction evaluation
+            lastActualResult = { result, color };
+            
             // Add to history
             history.push({number, result, color, issue: currentIssue});
             if (history.length > 20) history.shift();
@@ -352,16 +408,35 @@
             const tableBody = document.getElementById('tableBody');
             const newRow = tableBody.insertRow(0);
             
-            newRow.insertCell(0).textContent = currentIssue;
-            newRow.insertCell(1).textContent = number;
+            newRow.insertCell(0).textContent = number;
             
-            const resultCell = newRow.insertCell(2);
+            const resultCell = newRow.insertCell(1);
             resultCell.textContent = result;
             resultCell.className = result + '-cell';
             
-            const colorCell = newRow.insertCell(3);
+            const colorCell = newRow.insertCell(2);
             colorCell.textContent = color === 'G' ? '🟢' : '🔴';
             colorCell.className = color + '-cell';
+            
+            // Add prediction and status columns
+            const predictionCell = newRow.insertCell(3);
+            const statusCell = newRow.insertCell(4);
+            
+            if (lastPrediction !== null) {
+                predictionCell.textContent = lastPrediction;
+                predictionCell.className = (lastPrediction === 'B' || lastPrediction === 'G') ? 'B-cell' : 'S-cell';
+                
+                if (lastPredictionType === 'BS') {
+                    statusCell.textContent = lastPrediction === result ? 'WIN' : 'LOSS';
+                    statusCell.className = lastPrediction === result ? 'B-cell' : 'S-cell';
+                } else {
+                    statusCell.textContent = lastPrediction === color ? 'WIN' : 'LOSS';
+                    statusCell.className = lastPrediction === color ? 'B-cell' : 'S-cell';
+                }
+            } else {
+                predictionCell.textContent = '-';
+                statusCell.textContent = '-';
+            }
             
             // Remove oldest row if we exceed maxRows
             if (tableBody.rows.length > maxRows) {
@@ -371,8 +446,26 @@
             // Update history graph immediately
             updateHistoryGraph();
             
+            // Update streak indicator
+            updateStreakIndicator();
+            
             // Increment issue number
             currentIssue++;
+        }
+        
+        function updateStreakIndicator() {
+            const streakIndicator = document.getElementById('streakIndicator');
+            
+            if (winStreak > 0) {
+                streakIndicator.textContent = `🔥 ${winStreak} WIN STREAK`;
+                streakIndicator.className = 'win-streak';
+            } else if (lossStreak > 0) {
+                streakIndicator.textContent = `💔 ${lossStreak} LOSS STREAK`;
+                streakIndicator.className = 'loss-streak';
+            } else {
+                streakIndicator.textContent = '';
+                streakIndicator.className = '';
+            }
         }
         
         function startCountdown() {
@@ -424,388 +517,63 @@
             const lastEntry = history[history.length - 2]; // previous entry
             const secondLastEntry = history[history.length - 3]; // second last entry
             let prediction = null;
+            let predictionType = null;
             let strategyText = "";
             let strategyDetails = "";
             
             // Convert number to digits array for pattern detection
             const digits = String(currentNumber).split('').map(Number);
             
-            // First try to detect color patterns from the image
-            const colorPattern = detectColorPattern();
-            if (colorPattern) {
-                prediction = predictBasedOnColorPattern(colorPattern);
-                strategyText = colorPattern;
-                strategyDetails = "Color pattern detected - predicting based on color sequence";
+            // If last prediction was wrong, double down on the same prediction type
+            if (lossStreak > 0 && lastPrediction !== null) {
+                if (lastPredictionType === 'BS') {
+                    prediction = lastPrediction;
+                    predictionType = 'BS';
+                    strategyText = "Double Down on Previous Prediction (B/S)";
+                    strategyDetails = "After a loss, doubling down on the same B/S prediction";
+                } else if (lastPredictionType === 'color') {
+                    prediction = lastPrediction;
+                    predictionType = 'color';
+                    strategyText = "Double Down on Previous Prediction (Color)";
+                    strategyDetails = "After a loss, doubling down on the same color prediction";
+                }
             }
-            // If no color pattern detected, use the original S/B strategies
+            // If we're on a win streak, continue with the same prediction type
+            else if (winStreak > 0 && lastPrediction !== null) {
+                if (lastPredictionType === 'BS') {
+                    prediction = predictBS();
+                    predictionType = 'BS';
+                    strategyText = "Continue Winning Strategy (B/S)";
+                    strategyDetails = "Continuing with B/S prediction during win streak";
+                } else if (lastPredictionType === 'color') {
+                    prediction = predictColor();
+                    predictionType = 'color';
+                    strategyText = "Continue Winning Strategy (Color)";
+                    strategyDetails = "Continuing with color prediction during win streak";
+                }
+            }
+            // Otherwise, choose the prediction type with highest probability
             else {
-                // Strategy 1: Three Small in a row
-                if (checkStreak('S') >= 3) {
-                    prediction = 'B';
-                    strategyText = "Three Small streak detected";
-                    strategyDetails = "After three Small results in a row, predicting Big (Strategy 2)";
-                }
-                // Strategy 2: Contains 8 or 9
-                else if (digits.includes(8) || digits.includes(9)) {
-                    prediction = 'S';
-                    strategyText = "Number contains 8 or 9";
-                    strategyDetails = "When number contains 8 or 9, predicting Small (Strategy 3)";
-                }
-                // Strategy 3: Long streak break (4-5 same results)
-                else if (checkStreak('S') >= 4) {
-                    prediction = 'B';
-                    strategyText = "Long Small streak detected";
-                    strategyDetails = "After 4-5 Small results, predicting Big (Strategy 4)";
-                }
-                else if (checkStreak('B') >= 4) {
-                    prediction = 'S';
-                    strategyText = "Long Big streak detected";
-                    strategyDetails = "After 4-5 Big results, predicting Small (Strategy 4)";
-                }
-                // Strategy 4: Contains 0
-                else if (digits.includes(0)) {
-                    prediction = 'S';
-                    strategyText = "Number contains 0";
-                    strategyDetails = "When number contains 0, predicting Small (Strategy 5)";
-                }
-                // Strategy 5: Middle digit is small (1-2-3)
-                else if (digits.length >= 3 && digits[1] <= 3) {
-                    prediction = 'S';
-                    strategyText = "Middle digit is small";
-                    strategyDetails = "When middle digit is 1-2-3, predicting Small (Strategy 6)";
-                }
-                // Strategy 6: Pattern repetition
-                else if (history.length >= 3 && 
-                         lastEntry.result === secondLastEntry.result && 
-                         lastEntry.result !== currentResult) {
-                    prediction = lastEntry.result;
-                    strategyText = "Pattern repetition detected";
-                    strategyDetails = "When pattern repeats (like B-S-B), predicting same (Strategy 7)";
-                }
-                // Strategy 7: Stair pattern (3-4-5 or 6-7-8)
-                else if (history.length >= 3 && 
-                         Math.abs(lastEntry.number - secondLastEntry.number) === 1 && 
-                         Math.abs(currentNumber - lastEntry.number) === 1) {
-                    prediction = 'S';
-                    strategyText = "Stair pattern detected";
-                    strategyDetails = "When stair pattern (like 3-4-5), predicting Small (Strategy 8)";
-                }
-                // Strategy 8: Contains 5
-                else if (digits.includes(5)) {
-                    prediction = 'B';
-                    strategyText = "Number contains 5";
-                    strategyDetails = "When number contains 5, predicting Big (Strategy 9)";
-                }
-                // Strategy 9: Sum of digits >= 15 (for 3-digit numbers)
-                else if (digits.length >= 3 && digits.reduce((a,b) => a + b, 0) >= 15) {
-                    prediction = 'B';
-                    strategyText = "High digit sum";
-                    strategyDetails = "When sum of digits >= 15, predicting Big (Strategy 10)";
-                }
-                // Strategy 10: Single digit repeats three times
-                else if (history.length >= 3 && 
-                         lastEntry.number === secondLastEntry.number && 
-                         lastEntry.number === currentNumber) {
-                    prediction = currentResult === 'S' ? 'B' : 'S';
-                    strategyText = "Triple repeat detected";
-                    strategyDetails = "When same number appears three times, predicting opposite (Strategy 11)";
-                }
-                // Strategy 11: Ends with 1 or 2
-                else if (digits[digits.length - 1] === 1 || digits[digits.length - 1] === 2) {
-                    prediction = 'B';
-                    strategyText = "Ends with 1 or 2";
-                    strategyDetails = "When number ends with 1 or 2, predicting Big (Strategy 12)";
-                }
-                // Strategy 12: Middle digit is 7 or 8
-                else if (digits.length >= 3 && (digits[1] === 7 || digits[1] === 8)) {
-                    prediction = 'S';
-                    strategyText = "Middle digit is 7 or 8";
-                    strategyDetails = "When middle digit is 7 or 8, predicting Small (Strategy 13)";
-                }
-                // Strategy 13: All digits even
-                else if (digits.every(d => d % 2 === 0)) {
-                    prediction = 'S';
-                    strategyText = "All digits even";
-                    strategyDetails = "When all digits are even, predicting Small (Strategy 14)";
-                }
-                // Strategy 14: Results under 4 in a row
-                else if (history.length >= 3 && 
-                         lastEntry.number <= 4 && 
-                         secondLastEntry.number <= 4 && 
-                         currentNumber <= 4) {
-                    prediction = 'B';
-                    strategyText = "Consecutive low numbers";
-                    strategyDetails = "After consecutive numbers <=4, predicting Big (Strategy 15)";
-                }
-                // Strategy 15: Big streak of 7
-                else if (checkStreak('B') >= 7) {
-                    prediction = 'S';
-                    strategyText = "Big streak of 7";
-                    strategyDetails = "After 7 Big results, predicting Small (Strategy 16)";
-                }
-                // Strategy 16: Contains 7,8,9 together
-                else if ((digits.includes(7) && digits.includes(8)) || 
-                         (digits.includes(7) && digits.includes(9)) || 
-                         (digits.includes(8) && digits.includes(9))) {
-                    prediction = currentResult === 'S' ? 'B' : 'S';
-                    strategyText = "Contains high digits together";
-                    strategyDetails = "When 7,8,9 appear together, predicting opposite (Strategy 17)";
-                }
-                // Strategy 17: All digits same (like 555)
-                else if (new Set(digits).size === 1) {
-                    prediction = 'S';
-                    strategyText = "All digits identical";
-                    strategyDetails = "When all digits are same, predicting Small (Strategy 18)";
-                }
-                // Strategy 18: First digit small, last digit big
-                else if (digits.length >= 3 && digits[0] <= 3 && digits[digits.length - 1] >= 7) {
-                    prediction = 'B';
-                    strategyText = "First small, last big";
-                    strategyDetails = "When first digit small and last digit big, predicting Big (Strategy 19)";
-                }
-                // Strategy 19: Contains both 0 and 9
-                else if (digits.includes(0) && digits.includes(9)) {
-                    prediction = 'S';
-                    strategyText = "Contains 0 and 9";
-                    strategyDetails = "When number contains both 0 and 9, predicting Small (Strategy 20)";
-                }
-                // Strategy 20: All digits between 2-5
-                else if (digits.every(d => d >= 2 && d <= 5)) {
-                    prediction = currentResult;
-                    strategyText = "All digits 2-5";
-                    strategyDetails = "When all digits between 2-5, predicting same trend continues (Strategy 21)";
-                }
-                // Strategy 21: Same number appears multiple times in market
-                else if (history.filter(h => h.number === currentNumber).length >= 2) {
-                    prediction = currentResult === 'S' ? 'B' : 'S';
-                    strategyText = "Number repeating in market";
-                    strategyDetails = "When same number appears multiple times, predicting opposite (Strategy 22)";
-                }
-                // Strategy 22: Stair pattern (like 234 or 678)
-                else if (digits.length >= 3 && 
-                         digits[0] + 1 === digits[1] && 
-                         digits[1] + 1 === digits[2]) {
-                    prediction = 'S';
-                    strategyText = "Three-digit stair pattern";
-                    strategyDetails = "When three-digit stair pattern, predicting Small (Strategy 23)";
-                }
-                // Strategy 23: Middle digit is 5 or 6
-                else if (digits.length >= 3 && (digits[1] === 5 || digits[1] === 6)) {
-                    prediction = 'B';
-                    strategyText = "Middle digit is 5 or 6";
-                    strategyDetails = "When middle digit is 5 or 6, predicting Big (Strategy 24)";
-                }
-                // Strategy 24: Big-Small-Big pattern
-                else if (history.length >= 3 && 
-                         secondLastEntry.result === 'B' && 
-                         lastEntry.result === 'S' && 
-                         currentResult === 'B') {
-                    prediction = 'B';
-                    strategyText = "Big-Small-Big pattern";
-                    strategyDetails = "After Big-Small-Big, predicting Big again (Strategy 25)";
-                }
-                // Strategy 25: Ends with 6
-                else if (digits[digits.length - 1] === 6) {
-                    prediction = 'S';
-                    strategyText = "Ends with 6";
-                    strategyDetails = "When number ends with 6, predicting Small (Strategy 26)";
-                }
-                // Strategy 26: Multiple zeros in market
-                else if (history.filter(h => String(h.number).includes('0')).length >= 3) {
-                    prediction = 'B';
-                    strategyText = "Multiple zeros in market";
-                    strategyDetails = "When multiple zeros appear, predicting Big (Strategy 27)";
-                }
-                // Strategy 27: All digits odd
-                else if (digits.every(d => d % 2 !== 0)) {
-                    prediction = 'S';
-                    strategyText = "All digits odd";
-                    strategyDetails = "When all digits are odd, predicting Small (Strategy 28)";
-                }
-                // Strategy 28: Number like 193 or 109
-                else if ((digits.length === 3 && digits[0] === 1 && digits[2] === 3) || 
-                         (digits.length === 3 && digits[0] === 1 && digits[1] === 0 && digits[2] === 9)) {
-                    prediction = 'S';
-                    strategyText = "Special pattern (193/109)";
-                    strategyDetails = "When number matches special patterns, predicting Small (Strategy 29)";
-                }
-                // Strategy 29: Small streak of 4
-                else if (checkStreak('S') >= 4) {
-                    prediction = 'B';
-                    strategyText = "Small streak of 4";
-                    strategyDetails = "After 4 Small results, predicting Big (Strategy 30)";
-                }
-                // Strategy 30: Palindrome number (like 343)
-                else if (digits.length >= 3 && digits[0] === digits[digits.length - 1]) {
-                    prediction = currentResult === 'S' ? 'B' : 'S';
-                    strategyText = "Palindrome number";
-                    strategyDetails = "When palindrome number appears, predicting opposite (Strategy 31)";
-                }
-                // Strategy 31: Middle digit repeating
-                else if (digits.length >= 3 && 
-                         history.filter(h => String(h.number).length >= 3 && 
-                         String(h.number)[1] === String(currentNumber)[1]).length >= 2) {
-                    prediction = currentResult === 'S' ? 'B' : 'S';
-                    strategyText = "Middle digit repeating";
-                    strategyDetails = "When middle digit repeats, predicting opposite (Strategy 32)";
-                }
-                // Strategy 32: Pattern like 1-0-1
-                else if (history.length >= 3 && 
-                         secondLastEntry.number === 1 && 
-                         lastEntry.number === 0 && 
-                         currentNumber === 1) {
-                    prediction = 'B';
-                    strategyText = "1-0-1 pattern";
-                    strategyDetails = "After 1-0-1 pattern, predicting Big (Strategy 33)";
-                }
-                // Strategy 33: Last two digits same (like 44, 55)
-                else if (digits.length >= 2 && digits[digits.length - 1] === digits[digits.length - 2]) {
-                    prediction = 'S';
-                    strategyText = "Last two digits same";
-                    strategyDetails = "When last two digits same, predicting Small (Strategy 34)";
-                }
-                // Strategy 34: Contains both 8 and 1
-                else if (digits.includes(8) && digits.includes(1)) {
-                    prediction = currentResult === 'S' ? 'B' : 'S';
-                    strategyText = "Contains 8 and 1";
-                    strategyDetails = "When number contains both 8 and 1, predicting opposite (Strategy 35)";
-                }
-                // Strategy 35: Even-odd mix
-                else if (digits.some(d => d % 2 === 0) && digits.some(d => d % 2 !== 0)) {
-                    prediction = 'S';
-                    strategyText = "Even-odd mix";
-                    strategyDetails = "When even and odd digits mix, predicting Small (Strategy 36)";
-                }
-                // Strategy 36: Large digit difference (for 3-digit numbers)
-                else if (digits.length >= 3 && Math.max(...digits) - Math.min(...digits) >= 7) {
-                    prediction = currentResult === 'S' ? 'B' : 'S';
-                    strategyText = "Large digit spread";
-                    strategyDetails = "When digits have large difference, predicting opposite (Strategy 37)";
-                }
-                // Strategy 37: Middle digit is highest
-                else if (digits.length >= 3 && digits[1] > digits[0] && digits[1] > digits[2]) {
-                    prediction = 'S';
-                    strategyText = "Middle digit highest";
-                    strategyDetails = "When middle digit is highest, predicting Small (Strategy 38)";
-                }
-                // Strategy 38: Contains 5,7,9
-                else if (digits.includes(5) && digits.includes(7) && digits.includes(9)) {
-                    prediction = 'B';
-                    strategyText = "Contains 5,7,9";
-                    strategyDetails = "When number contains 5,7,9, predicting Big (Strategy 39)";
-                }
-                // Strategy 39: Ends with 2 on both sides
-                else if (digits.length >= 3 && digits[0] === 2 && digits[digits.length - 1] === 2) {
-                    prediction = 'B';
-                    strategyText = "Starts and ends with 2";
-                    strategyDetails = "When number starts and ends with 2, predicting Big (Strategy 40)";
-                }
-                // Strategy 40: Contains three 9s
-                else if (digits.filter(d => d === 9).length >= 3) {
-                    prediction = 'S';
-                    strategyText = "Multiple 9s";
-                    strategyDetails = "When number contains multiple 9s, predicting Small (Strategy 41)";
-                }
-                // Strategy 41: Contains two 6s
-                else if (digits.filter(d => d === 6).length >= 2) {
-                    prediction = 'S';
-                    strategyText = "Multiple 6s";
-                    strategyDetails = "When number contains multiple 6s, predicting Small (Strategy 42)";
-                }
-                // Strategy 42: Big followed by 0
-                else if (lastEntry.result === 'B' && currentNumber === 0) {
-                    prediction = 'S';
-                    strategyText = "Big followed by 0";
-                    strategyDetails = "When Big is followed by 0, predicting Small (Strategy 43)";
-                }
-                // Strategy 43: Stair pattern (like 345 or 678)
-                else if (digits.length >= 3 && 
-                         digits[0] + 1 === digits[1] && 
-                         digits[1] + 1 === digits[2]) {
-                    prediction = 'S';
-                    strategyText = "Three-digit stair pattern";
-                    strategyDetails = "When three-digit stair pattern, predicting Small (Strategy 44)";
-                }
-                // Strategy 44: Same digit appears four times
-                else if (digits.length >= 3 && 
-                         new Set(digits).size === 1 && 
-                         history.filter(h => String(h.number)[0] === String(currentNumber)[0]).length >= 3) {
-                    prediction = currentResult === 'S' ? 'B' : 'S';
-                    strategyText = "Digit repeating in market";
-                    strategyDetails = "When digit appears multiple times, predicting opposite (Strategy 45)";
-                }
-                // Strategy 45: Number like 010
-                else if (digits.length === 3 && digits[0] === 0 && digits[1] === 1 && digits[2] === 0) {
-                    prediction = 'B';
-                    strategyText = "010 pattern";
-                    strategyDetails = "After 010 pattern, predicting Big (Strategy 46)";
-                }
-                // Strategy 46: Sequence like 77 then 88
-                else if (history.length >= 2 && 
-                         String(lastEntry.number).length === 2 && 
-                         String(lastEntry.number)[0] === String(lastEntry.number)[1] && 
-                         String(secondLastEntry.number).length === 2 && 
-                         String(secondLastEntry.number)[0] === String(secondLastEntry.number)[1] && 
-                         String(secondLastEntry.number)[0] === String(Number(String(lastEntry.number)[0]) - 1)) {
-                    prediction = 'S';
-                    strategyText = "77-88 sequence";
-                    strategyDetails = "After sequence like 77 then 88, predicting Small (Strategy 47)";
-                }
-                // Strategy 47: Any digit repeats twice
-                else if (new Set(digits).size < digits.length) {
-                    prediction = currentResult === 'S' ? 'B' : 'S';
-                    strategyText = "Digit repeats in number";
-                    strategyDetails = "When digit repeats in number, predicting opposite (Strategy 48)";
-                }
-                // Strategy 48: Ends with 2 multiple times
-                else if (digits[digits.length - 1] === 2 && 
-                         history.filter(h => String(h.number)[String(h.number).length - 1] === '2').length >= 2) {
-                    prediction = 'B';
-                    strategyText = "Ends with 2 multiple times";
-                    strategyDetails = "When number ends with 2 multiple times, predicting Big (Strategy 49)";
-                }
-                // Strategy 49: Middle digit is 5 with small sides
-                else if (digits.length >= 3 && digits[1] === 5 && digits[0] <= 3 && digits[2] <= 3) {
-                    prediction = 'S';
-                    strategyText = "Middle 5 with small sides";
-                    strategyDetails = "When middle digit is 5 with small sides, predicting Small (Strategy 50)";
-                }
-                // Fallback strategy based on recent distribution
-                else {
-                    // Count recent S/B distribution
-                    let sCount = 0, bCount = 0;
-                    for (let i = Math.max(0, history.length - 5); i < history.length; i++) {
-                        if (history[i].result === 'S') sCount++;
-                        else bCount++;
-                    }
-                    
-                    if (sCount > bCount + 2) {
-                        prediction = 'B';
-                        strategyText = "Recent Small bias";
-                        strategyDetails = "After multiple Small results, predicting Big (Fallback Strategy)";
-                    } else if (bCount > sCount + 2) {
-                        prediction = 'S';
-                        strategyText = "Recent Big bias";
-                        strategyDetails = "After multiple Big results, predicting Small (Fallback Strategy)";
-                    } else {
-                        // If no S/B pattern detected, try color prediction
-                        const colorPrediction = predictColorBasedOnHistory();
-                        if (colorPrediction) {
-                            prediction = colorPrediction;
-                            strategyText = "Color pattern detected";
-                            strategyDetails = "Predicting based on recent color patterns";
-                        } else {
-                            strategyText = "No strong pattern detected";
-                            strategyDetails = "No clear prediction available based on current patterns";
-                            statusElement.textContent = "No clear prediction available";
-                            statusElement.className = "status-message error";
-                            predictionValue.textContent = '-';
-                            strategyInfo.style.display = 'none';
-                            return;
-                        }
-                    }
+                // Calculate probabilities for both prediction types
+                const bsProbability = calculateBSProbability();
+                const colorProbability = calculateColorProbability();
+                
+                if (bsProbability >= colorProbability) {
+                    prediction = predictBS();
+                    predictionType = 'BS';
+                    strategyText = "High Confidence B/S Prediction";
+                    strategyDetails = "B/S prediction has higher probability based on patterns";
+                } else {
+                    prediction = predictColor();
+                    predictionType = 'color';
+                    strategyText = "High Confidence Color Prediction";
+                    strategyDetails = "Color prediction has higher probability based on patterns";
                 }
             }
+            
+            // Store the prediction for next evaluation
+            lastPrediction = prediction;
+            lastPredictionType = predictionType;
             
             if (prediction) {
                 predictionValue.textContent = prediction;
@@ -830,7 +598,166 @@
                 strategyTitle.textContent = strategyText;
                 strategyDesc.textContent = strategyDetails;
                 strategyInfo.style.display = 'block';
+            } else {
+                strategyText = "No strong pattern detected";
+                strategyDetails = "No clear prediction available based on current patterns";
+                statusElement.textContent = "No clear prediction available";
+                statusElement.className = "status-message error";
+                predictionValue.textContent = '-';
+                strategyInfo.style.display = 'none';
             }
+        }
+        
+        function predictBS() {
+            const currentNumber = history[history.length - 1].number;
+            const currentResult = (currentNumber <= 4) ? 'S' : 'B';
+            const lastEntry = history[history.length - 2];
+            const secondLastEntry = history[history.length - 3];
+            const digits = String(currentNumber).split('').map(Number);
+            
+            // Strategy 1: Three Small in a row
+            if (checkStreak('S') >= 3) {
+                return 'B';
+            }
+            // Strategy 2: Contains 8 or 9
+            else if (digits.includes(8) || digits.includes(9)) {
+                return 'S';
+            }
+            // Strategy 3: Long streak break (4-5 same results)
+            else if (checkStreak('S') >= 4) {
+                return 'B';
+            }
+            else if (checkStreak('B') >= 4) {
+                return 'S';
+            }
+            // Strategy 4: Contains 0
+            else if (digits.includes(0)) {
+                return 'S';
+            }
+            // Strategy 5: Middle digit is small (1-2-3)
+            else if (digits.length >= 3 && digits[1] <= 3) {
+                return 'S';
+            }
+            // Strategy 6: Pattern repetition
+            else if (history.length >= 3 && 
+                     lastEntry.result === secondLastEntry.result && 
+                     lastEntry.result !== currentResult) {
+                return lastEntry.result;
+            }
+            // Strategy 7: Stair pattern (3-4-5 or 6-7-8)
+            else if (history.length >= 3 && 
+                     Math.abs(lastEntry.number - secondLastEntry.number) === 1 && 
+                     Math.abs(currentNumber - lastEntry.number) === 1) {
+                return 'S';
+            }
+            // Strategy 8: Contains 5
+            else if (digits.includes(5)) {
+                return 'B';
+            }
+            // Strategy 9: Sum of digits >= 15 (for 3-digit numbers)
+            else if (digits.length >= 3 && digits.reduce((a,b) => a + b, 0) >= 15) {
+                return 'B';
+            }
+            // Strategy 10: Single digit repeats three times
+            else if (history.length >= 3 && 
+                     lastEntry.number === secondLastEntry.number && 
+                     lastEntry.number === currentNumber) {
+                return currentResult === 'S' ? 'B' : 'S';
+            }
+            // Fallback to recent distribution
+            else {
+                // Count recent S/B distribution
+                let sCount = 0, bCount = 0;
+                for (let i = Math.max(0, history.length - 5); i < history.length; i++) {
+                    if (history[i].result === 'S') sCount++;
+                    else bCount++;
+                }
+                
+                if (sCount > bCount + 2) {
+                    return 'B';
+                } else if (bCount > sCount + 2) {
+                    return 'S';
+                } else {
+                    // If no clear pattern, return the opposite of last result
+                    return currentResult === 'S' ? 'B' : 'S';
+                }
+            }
+        }
+        
+        function predictColor() {
+            const currentNumber = history[history.length - 1].number;
+            const currentColor = (currentNumber % 2 === 1) ? 'G' : 'R';
+            
+            // Check for color patterns first
+            const colorPattern = detectColorPattern();
+            if (colorPattern) {
+                return predictBasedOnColorPattern(colorPattern);
+            }
+            
+            // Check for streaks
+            const recentColors = history.slice(-5).map(entry => entry.color);
+            const lastColor = recentColors[recentColors.length-1];
+            let streak = 1;
+            for (let i = recentColors.length-2; i >= 0; i--) {
+                if (recentColors[i] === lastColor) streak++;
+                else break;
+            }
+            
+            // If long streak, predict opposite
+            if (streak >= 3) {
+                return lastColor === 'G' ? 'R' : 'G';
+            }
+            
+            // Check for alternation pattern
+            if (recentColors.length >= 3) {
+                const c1 = recentColors[recentColors.length-1];
+                const c2 = recentColors[recentColors.length-2];
+                const c3 = recentColors[recentColors.length-3];
+                
+                if (c1 === c2 && c2 !== c3) {
+                    return c3;
+                }
+                if (c1 !== c2 && c2 === c3) {
+                    return c1;
+                }
+                if (c1 !== c2 && c2 !== c3 && c1 !== c3) {
+                    return c2;
+                }
+            }
+            
+            // Fallback: predict opposite of last color
+            return currentColor === 'G' ? 'R' : 'G';
+        }
+        
+        function calculateBSProbability() {
+            // Simple probability calculation based on recent patterns
+            const recentResults = history.slice(-5).map(entry => entry.result);
+            const sCount = recentResults.filter(r => r === 'S').length;
+            const bCount = recentResults.filter(r => r === 'B').length;
+            
+            // If we have a clear pattern, return higher probability
+            if (sCount >= 4 || bCount >= 4) return 0.8;
+            if (sCount >= 3 || bCount >= 3) return 0.7;
+            
+            // Otherwise return base probability
+            return 0.6;
+        }
+        
+        function calculateColorProbability() {
+            // Simple probability calculation based on recent patterns
+            const recentColors = history.slice(-5).map(entry => entry.color);
+            const gCount = recentColors.filter(c => c === 'G').length;
+            const rCount = recentColors.filter(c => c === 'R').length;
+            
+            // If we have a clear pattern, return higher probability
+            if (gCount >= 4 || rCount >= 4) return 0.8;
+            if (gCount >= 3 || rCount >= 3) return 0.7;
+            
+            // Check for color patterns
+            if (detectColorPattern()) return 0.75;
+            
+            // Otherwise return base probability
+            return 0.6;
         }
         
         function detectColorPattern() {
@@ -893,59 +820,10 @@
             }
         }
         
-        function predictColorBasedOnHistory() {
-            if (history.length < 3) return null;
-            
-            // Get recent colors
-            const recentColors = history.slice(-5).map(entry => entry.color);
-            
-            // Check for streaks
-            const lastColor = recentColors[recentColors.length-1];
-            let streak = 1;
-            for (let i = recentColors.length-2; i >= 0; i--) {
-                if (recentColors[i] === lastColor) streak++;
-                else break;
-            }
-            
-            // If long streak, predict opposite
-            if (streak >= 3) {
-                return lastColor === 'G' ? 'R' : 'G';
-            }
-            
-            // Check for alternation pattern
-            if (recentColors.length >= 3) {
-                const c1 = recentColors[recentColors.length-1];
-                const c2 = recentColors[recentColors.length-2];
-                const c3 = recentColors[recentColors.length-3];
-                
-                if (c1 === c2 && c2 !== c3) {
-                    return c3;
-                }
-                if (c1 !== c2 && c2 === c3) {
-                    return c1;
-                }
-                if (c1 !== c2 && c2 !== c3 && c1 !== c3) {
-                    return c2;
-                }
-            }
-            
-            // Fallback: no clear color pattern
-            return null;
-        }
-        
         function checkStreak(type) {
             let streak = 0;
             for (let i = history.length - 1; i >= 0; i--) {
                 if (history[i].result === type) streak++;
-                else break;
-            }
-            return streak;
-        }
-        
-        function checkEvenStreak() {
-            let streak = 0;
-            for (let i = history.length - 1; i >= 0; i--) {
-                if (history[i].number % 2 === 0) streak++;
                 else break;
             }
             return streak;
