@@ -1,102 +1,986 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>User Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark9hack</title>
     <style>
-        body {font-family: Arial; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;}
-        .login-box {background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); width: 320px; text-align: center;}
-        input {width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; font-size: 16px;}
-        button {width: 100%; padding: 12px; background: #1877f2; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px;}
-        .error {color: red; margin-top: 10px;}
+        :root {
+            --primary-color: #FF5722;
+            --secondary-color: #E64A19;
+            --dark-bg: #121212;
+            --dark-surface: #1E1E1E;
+            --dark-text: #FFFFFF;
+            --animation-duration: 0.5s;
+            --small-color: #4CAF50;
+            --big-color: #F44336;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            transition: all var(--animation-duration);
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--dark-surface);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .analysis-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--dark-surface);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            text-align: left;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            background-color: var(--dark-surface);
+        }
+        
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #2a2a2a;
+        }
+        
+        .number-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        .number-btn {
+            padding: 15px 0;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .number-btn:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .current-period {
+            font-weight: bold;
+            margin: 15px 0;
+            font-size: 1.2rem;
+        }
+        
+        h1, h3 {
+            text-align: center;
+            color: var(--primary-color);
+        }
+        
+        .pattern-display {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #333;
+            border-radius: 8px;
+            min-height: 100px;
+        }
+        
+        .prediction-display {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .animated-text {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid var(--primary-color);
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary-color) }
+        }
+        
+        .pattern-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            background-color: #7B1FA2;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .prediction-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            animation: bounce 0.5s alternate infinite;
+        }
+        
+        .small-prediction {
+            color: var(--small-color);
+        }
+        
+        .big-prediction {
+            color: var(--big-color);
+        }
+        
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+        
+        .waiting-text {
+            color: #FFC107;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .result-big {
+            color: var(--big-color);
+            font-weight: bold;
+        }
+        
+        .result-small {
+            color: var(--small-color);
+            font-weight: bold;
+        }
+        
+        .pattern-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .pattern-item {
+            padding: 3px;
+            font-size: 0.7rem;
+            background-color: #333;
+            border-radius: 3px;
+            text-align: center;
+        }
+        
+        .active-pattern {
+            background-color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* New styles for title animation */
+        .title-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .title-loading {
+            position: absolute;
+            background-color: var(--primary-color);
+            opacity: 0.7;
+        }
+
+        .top-line {
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            animation: lineLoad 0.75s linear infinite;
+        }
+
+        .right-line {
+            top: 0;
+            right: 0;
+            width: 3px;
+            height: 0;
+            animation: lineLoad 0.75s linear infinite 0.25s;
+        }
+
+        .bottom-line {
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 3px;
+            animation: lineLoad 0.75s linear infinite 0.5s;
+        }
+
+        .left-line {
+            bottom: 0;
+            left: 0;
+            width: 3px;
+            height: 0;
+            animation: lineLoad 0.75s linear infinite 0.75s;
+        }
+
+        @keyframes lineLoad {
+            0% {
+                width: 0;
+                height: 0;
+            }
+            50% {
+                width: 100%;
+                height: 100%;
+            }
+            100% {
+                width: 0;
+                height: 0;
+            }
+        }
+
+        /* Telegram button styles */
+        .telegram-btn {
+            display: inline-block;
+            background-color: #0088cc;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 10px 0;
+            transition: all 0.3s;
+        }
+
+        .telegram-btn:hover {
+            background-color: #006699;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h2>User Login</h2>
-        <input type="text" id="accessKey" placeholder="Enter Access Key">
-        <button onclick="login()">Login</button>
-        <div id="error" class="error"></div>
+    
+    
+    <div class="container">
+        <div class="input-section">
+            <a href="https://t.me/dark67hack" class="telegram-btn" id="telegramBtn">Join Telegram</a>
+            
+            <div class="number-buttons">
+                <button class="number-btn" onclick="addNumber(0)">0</button>
+                <button class="number-btn" onclick="addNumber(1)">1</button>
+                <button class="number-btn" onclick="addNumber(2)">2</button>
+                <button class="number-btn" onclick="addNumber(3)">3</button>
+                <button class="number-btn" onclick="addNumber(4)">4</button>
+                <button class="number-btn" onclick="addNumber(5)">5</button>
+                <button class="number-btn" onclick="addNumber(6)">6</button>
+                <button class="number-btn" onclick="addNumber(7)">7</button>
+                <button class="number-btn" onclick="addNumber(8)">8</button>
+                <button class="number-btn" onclick="addNumber(9)">9</button>
+            </div>
+            
+            <div class="current-period">
+                Next Prediction: <span id="nextPrediction" class="prediction-number">-</span>
+                <div id="waitingText" class="waiting-text" style="display: none;">Analyzing patterns...</div>
+            </div>
+        </div>
+        
+        <div class="analysis-section">
+            <h3>Pattern Analysis</h3>
+            <div class="pattern-display" id="patternDisplay">
+                <div class="animated-text">Enter numbers to detect patterns...</div>
+            </div>
+            
+            <div class="prediction-display">
+                <h4>Detected Patterns:</h4>
+                <div id="detectedPatterns">
+                    <span class="pattern-badge">No patterns detected yet</span>
+                </div>
+                
+                <h4 style="margin-top: 15px;">Pattern History:</h4>
+                <div class="pattern-list" id="patternHistory">
+                    <!-- Pattern history will appear here -->
+                </div>
+                
+                <h4 style="margin-top: 15px;">Prediction Analysis:</h4>
+                <div id="predictionAnalysis">
+                    Enter more numbers (minimum 5) for prediction analysis
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>Issue</th>
+                <th>Number</th>
+                <th>Result</th>
+                <th>Pattern</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Results will be added here -->
+        </tbody>
+    </table>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <script>
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyAWs4V81fLFH6khFkHe0oJIbJeXuZs1DI4",
-            authDomain: "dark-tools-93abd.firebaseapp.com",
-            databaseURL: "https://dark-tools-93abd-default-rtdb.firebaseio.com",
-            projectId: "dark-tools-93abd",
-            storageBucket: "dark-tools-93abd.appspot.com",
-            messagingSenderId: "1003509016475",
-            appId: "1:1003509016475:android:826836719187aa12fc633e"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const keysRef = database.ref('FOOOOOOOOOOOOOOOOO');
-
-        // Generate device ID
-        function getDeviceId() {
-            let deviceId = localStorage.getItem('deviceId');
-            if (!deviceId) {
-                deviceId = 'd-' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('deviceId', deviceId);
-            }
-            return deviceId;
-        }
-
-        // Login
-        function login() {
-            const accessKey = document.getElementById('accessKey').value.trim();
-            const deviceId = getDeviceId();
+        let currentIssue = 1;
+        const currentPeriod = 1000;
+        const maxRows = 15;
+        let numberHistory = [];
+        let patternHistory = [];
+        const patternThreshold = 3;
+        
+        // All pattern types
+        const patternTypes = [
+            "Zig-Zag", "Double", "Triple", "Straight", "Mirror", 
+            "Six", "Jack", "Sequence", "Alternating", "Reverse", 
+            "Same-End", "Pyramid", "Sandwich", "Repeater", "Up-Down", 
+            "Odd-Even", "Snake", "Block", "Ladder", "Cross", 
+            "Back-to-Back", "Step-Up", "Step-Down", "Mirror Zigzag", "Triple Double", 
+            "Random Break", "Color Loop", "Shift Left", "Shift Right", "Center Lock", 
+            "Half-Half", "Pattern Cut", "Edge Repeat", "Forward Mirror", "Diamond", 
+            "Side Flip", "Long Hold", "Time Jump", "Delayed Repeat", "Four Set"
+        ];
+        
+        // Title animation every 3 seconds
+        function animateTitle() {
+            const title = document.getElementById('mainTitle');
+            const loadingLines = document.querySelectorAll('.title-loading');
             
-            if (!accessKey) {
-                document.getElementById('error').textContent = "Please enter access key";
-                return;
-            }
+            // Reset animation
+            title.style.opacity = '0';
+            loadingLines.forEach(line => {
+                line.style.width = '0';
+                line.style.height = '0';
+            });
             
-            keysRef.child(accessKey).once('value', snapshot => {
-                const keyData = snapshot.val();
-                
-                if (!keyData) {
-                    document.getElementById('error').textContent = "Invalid access key";
-                    return;
-                }
-                
-                // Check if key is already used by another device
-                if (keyData.deviceId && keyData.deviceId !== deviceId) {
-                    document.getElementById('error').textContent = "This key is already used on another device";
-                    return;
-                }
-                
-                // Check if key is expired
-                if (keyData.expiresAt < Date.now()) {
-                    document.getElementById('error').textContent = "This key has expired";
-                    return;
-                }
-                
-                // Check if key is inactive
-                if (!keyData.isActive) {
-                    document.getElementById('error').textContent = "This key is deactivated";
-                    return;
-                }
-                
-                // Mark key as used
-                keysRef.child(accessKey).update({
-                    used: true,
-                    deviceId: deviceId
+            // Animate lines
+            setTimeout(() => {
+                loadingLines.forEach(line => {
+                    line.style.width = '';
+                    line.style.height = '';
                 });
                 
-                // Store login info
-                localStorage.setItem('userLoggedIn', 'true');
-                localStorage.setItem('accessKey', accessKey);
-                localStorage.setItem('expiresAt', keyData.expiresAt);
+                // Show title when animation completes
+                setTimeout(() => {
+                    title.style.opacity = '1';
+                }, 750);
+            }, 10);
+        }
+        
+        // Start title animation and repeat every 3 seconds
+        animateTitle();
+        setInterval(animateTitle, 3000);
+        
+        // Set Telegram channel link (you can update this later)
+        document.getElementById('telegramBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Please add your Telegram channel link in the code');
+            // Replace the alert with your actual Telegram channel link
+            // window.open('YOUR_TELEGRAM_CHANNEL_LINK', '_blank');
+        });
+        
+        function addNumber(number) {
+            // Determine Result (SMALL/BIG)
+            const result = (number <= 4) ? 'SMALL' : 'BIG';
+            const resultClass = (number <= 4) ? 'result-small' : 'result-big';
+            
+            // Add to table
+            const tableBody = document.getElementById('tableBody');
+            const newRow = tableBody.insertRow(0);
+            
+            newRow.insertCell(0).textContent = currentIssue;
+            newRow.insertCell(1).textContent = number;
+            
+            // Add result cell with appropriate class
+            const resultCell = newRow.insertCell(2);
+            resultCell.textContent = result;
+            resultCell.className = resultClass;
+            
+            // Add pattern detection cell
+            const patternCell = newRow.insertCell(3);
+            patternCell.textContent = '-';
+            patternCell.id = `pattern-${currentIssue}`;
+            
+            // Remove oldest row if we exceed maxRows
+            if (tableBody.rows.length > maxRows) {
+                tableBody.deleteRow(maxRows);
+            }
+            
+            // Add to history for pattern detection
+            numberHistory.unshift(number);
+            if (numberHistory.length > 10) {
+                numberHistory.pop();
+            }
+            
+            // Show waiting text
+            document.getElementById('nextPrediction').textContent = '-';
+            document.getElementById('waitingText').style.display = 'block';
+            
+            // Delay the prediction analysis for 3 seconds
+            setTimeout(() => {
+                // Analyze patterns
+                analyzePatterns();
                 
-                // Redirect to user panel
-                window.location.href = "user_panel.html";
+                // Hide waiting text
+                document.getElementById('waitingText').style.display = 'none';
+            }, 3000);
+            
+            // Increment issue number
+            currentIssue++;
+        }
+        
+        function analyzePatterns() {
+            if (numberHistory.length < patternThreshold) return;
+            
+            const patternDisplay = document.getElementById('patternDisplay');
+            const detectedPatterns = document.getElementById('detectedPatterns');
+            const predictionAnalysis = document.getElementById('predictionAnalysis');
+            const nextPredictionElement = document.getElementById('nextPrediction');
+            const patternHistoryElement = document.getElementById('patternHistory');
+            
+            // Clear previous patterns
+            detectedPatterns.innerHTML = '';
+            
+            // Detect patterns
+            const detected = detectPatterns(numberHistory);
+            
+            // Display detected patterns
+            if (detected.length > 0) {
+                detected.forEach(pattern => {
+                    const badge = document.createElement('span');
+                    badge.className = 'pattern-badge';
+                    badge.textContent = pattern;
+                    detectedPatterns.appendChild(badge);
+                    
+                    // Add to pattern history if not already there
+                    if (!patternHistory.includes(pattern)) {
+                        patternHistory.unshift(pattern);
+                        if (patternHistory.length > 15) {
+                            patternHistory.pop();
+                        }
+                    }
+                });
+                
+                patternDisplay.innerHTML = `<div class="animated-text">Pattern detected: ${detected.join(', ')}</div>`;
+            } else {
+                detectedPatterns.innerHTML = '<span class="pattern-badge">No strong patterns detected</span>';
+                patternDisplay.innerHTML = '<div class="animated-text">Analyzing number sequence...</div>';
+            }
+            
+            // Update pattern history display
+            patternHistoryElement.innerHTML = '';
+            patternHistory.forEach(pattern => {
+                const patternItem = document.createElement('div');
+                patternItem.className = 'pattern-item';
+                patternItem.textContent = pattern;
+                if (detected.includes(pattern)) {
+                    patternItem.classList.add('active-pattern');
+                }
+                patternHistoryElement.appendChild(patternItem);
             });
+            
+            // Generate prediction if we have enough data
+            if (numberHistory.length >= 5) {
+                const prediction = generatePrediction(detected);
+                const predictionResult = prediction <= 4 ? 'SMALL' : 'BIG';
+                
+                // Update prediction display with appropriate class
+                nextPredictionElement.textContent = `${prediction} (${predictionResult})`;
+                nextPredictionElement.className = `prediction-number ${prediction <= 4 ? 'small-prediction' : 'big-prediction'}`;
+                
+                // Prediction analysis
+                let analysisText = '';
+                if (detected.length > 0) {
+                    analysisText = `Based on ${detected.join(' and ')}, next number likely to be ${predictionResult}`;
+                } else {
+                    analysisText = 'No strong pattern detected. Using default prediction';
+                }
+                
+                predictionAnalysis.innerHTML = `
+                    <p>${analysisText}</p>
+                    <p>Recent numbers: ${numberHistory.slice(0, 5).map(n => `${n} (${n <= 4 ? 'S' : 'B'})`).join(', ')}</p>
+                `;
+            }
+        }
+        
+        function detectPatterns(numbers) {
+            const detected = [];
+            const recent = numbers.slice(0, 5);
+            
+            // Check for all pattern types
+            if (isZigZag(recent)) detected.push("Zig-Zag");
+            if (isDouble(recent)) detected.push("Double");
+            if (isTriple(recent)) detected.push("Triple");
+            if (isStraight(recent)) detected.push("Straight");
+            if (isMirror(recent)) detected.push("Mirror");
+            if (isSix(recent)) detected.push("Six");
+            if (isJack(recent)) detected.push("Jack");
+            if (isSequence(recent)) detected.push("Sequence");
+            if (isAlternating(recent)) detected.push("Alternating");
+            if (isReverse(recent)) detected.push("Reverse");
+            if (isSameEnd(recent)) detected.push("Same-End");
+            if (isPyramid(recent)) detected.push("Pyramid");
+            if (isSandwich(recent)) detected.push("Sandwich");
+            if (isRepeater(recent)) detected.push("Repeater");
+            if (isUpDown(recent)) detected.push("Up-Down");
+            if (isOddEven(recent)) detected.push("Odd-Even");
+            if (isSnake(recent)) detected.push("Snake");
+            if (isBlock(recent)) detected.push("Block");
+            if (isLadder(recent)) detected.push("Ladder");
+            if (isCross(recent)) detected.push("Cross");
+            if (isBackToBack(recent)) detected.push("Back-to-Back");
+            if (isStepUp(recent)) detected.push("Step-Up");
+            if (isStepDown(recent)) detected.push("Step-Down");
+            if (isMirrorZigzag(recent)) detected.push("Mirror Zigzag");
+            if (isTripleDouble(recent)) detected.push("Triple Double");
+            if (isRandomBreak(recent)) detected.push("Random Break");
+            if (isColorLoop(recent)) detected.push("Color Loop");
+            if (isShiftLeft(recent)) detected.push("Shift Left");
+            if (isShiftRight(recent)) detected.push("Shift Right");
+            if (isCenterLock(recent)) detected.push("Center Lock");
+            if (isHalfHalf(recent)) detected.push("Half-Half");
+            if (isPatternCut(recent)) detected.push("Pattern Cut");
+            if (isEdgeRepeat(recent)) detected.push("Edge Repeat");
+            if (isForwardMirror(recent)) detected.push("Forward Mirror");
+            if (isDiamond(recent)) detected.push("Diamond");
+            if (isSideFlip(recent)) detected.push("Side Flip");
+            if (isLongHold(recent)) detected.push("Long Hold");
+            if (isTimeJump(recent)) detected.push("Time Jump");
+            if (isDelayedRepeat(recent)) detected.push("Delayed Repeat");
+            if (isFourSet(recent)) detected.push("Four Set");
+            
+            return detected;
+        }
+        
+        function generatePrediction(detectedPatterns) {
+            // If we have detected patterns, use them for prediction
+            if (detectedPatterns && detectedPatterns.length > 0) {
+                const lastNumber = numberHistory[0];
+                
+                // Prediction based on patterns
+                if (detectedPatterns.includes("Zig-Zag")) {
+                    return (lastNumber + 2) % 10;
+                }
+                if (detectedPatterns.includes("Double")) {
+                    return lastNumber;
+                }
+                if (detectedPatterns.includes("Triple")) {
+                    return lastNumber;
+                }
+                if (detectedPatterns.includes("Straight")) {
+                    return (lastNumber + 1) % 10;
+                }
+                if (detectedPatterns.includes("Mirror")) {
+                    return 9 - lastNumber;
+                }
+                if (detectedPatterns.includes("Sequence")) {
+                    return (lastNumber + 1) % 10;
+                }
+                if (detectedPatterns.includes("Alternating")) {
+                    return lastNumber <= 4 ? lastNumber + 5 : lastNumber - 5;
+                }
+                // Add more pattern-based predictions as needed
+            }
+            
+            // Default prediction based on recent numbers
+            const recent = numberHistory.slice(0, 5);
+            const sum = recent.reduce((a, b) => a + b, 0);
+            const avg = sum / recent.length;
+            return Math.round(avg);
+        }
+        
+        // Pattern detection functions
+        function isZigZag(numbers) {
+            if (numbers.length < 3) return false;
+            for (let i = 2; i < numbers.length; i++) {
+                if (!((numbers[i-2] < numbers[i-1] && numbers[i-1] > numbers[i]) || 
+                      (numbers[i-2] > numbers[i-1] && numbers[i-1] < numbers[i]))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        function isDouble(numbers) {
+            if (numbers.length < 2) return false;
+            return numbers[0] === numbers[1];
+        }
+        
+        function isTriple(numbers) {
+            if (numbers.length < 3) return false;
+            return numbers[0] === numbers[1] && numbers[1] === numbers[2];
+        }
+        
+        function isStraight(numbers) {
+            if (numbers.length < 3) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                if (numbers[i] !== (numbers[i-1] + 1) % 10) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        function isMirror(numbers) {
+            if (numbers.length < 3) return false;
+            for (let i = 0; i < Math.floor(numbers.length / 2); i++) {
+                if (numbers[i] !== 9 - numbers[numbers.length - 1 - i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        function isSix(numbers) {
+            if (numbers.length < 3) return false;
+            return numbers.slice(0, 3).filter(n => n === 6).length >= 2;
+        }
+        
+        function isJack(numbers) {
+            if (numbers.length < 3) return false;
+            return numbers.slice(0, 3).filter(n => n === 7).length >= 2;
+        }
+        
+        function isSequence(numbers) {
+            if (numbers.length < 3) return false;
+            const diff = numbers[1] - numbers[0];
+            for (let i = 2; i < numbers.length; i++) {
+                if (numbers[i] - numbers[i-1] !== diff) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        function isAlternating(numbers) {
+            if (numbers.length < 4) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                const current = numbers[i] <= 4 ? 'S' : 'B';
+                const prev = numbers[i-1] <= 4 ? 'S' : 'B';
+                if (current === prev) return false;
+            }
+            return true;
+        }
+        
+        function isReverse(numbers) {
+            if (numbers.length < 3) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                if (numbers[i] !== (numbers[i-1] - 1 + 10) % 10) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        function isSameEnd(numbers) {
+            if (numbers.length < 3) return false;
+            const firstDigit = numbers[0] % 10;
+            const lastDigit = numbers[numbers.length-1] % 10;
+            return firstDigit === lastDigit;
+        }
+        
+        function isPyramid(numbers) {
+            if (numbers.length < 5) return false;
+            const mid = Math.floor(numbers.length / 2);
+            for (let i = 0; i < mid; i++) {
+                if (numbers[i] !== numbers[numbers.length - 1 - i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        // Add more pattern detection functions as needed...
+        function isSandwich(numbers) {
+            if (numbers.length < 3) return false;
+            return numbers[0] === numbers[2] && numbers[0] !== numbers[1];
+        }
+        
+        function isRepeater(numbers) {
+            if (numbers.length < 4) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                if (numbers[i] !== numbers[0]) return false;
+            }
+            return true;
+        }
+        
+        function isUpDown(numbers) {
+            if (numbers.length < 4) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                if (i % 2 === 1 && numbers[i] <= numbers[i-1]) return false;
+                if (i % 2 === 0 && numbers[i] >= numbers[i-1]) return false;
+            }
+            return true;
+        }
+        
+        function isOddEven(numbers) {
+            if (numbers.length < 4) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                if (numbers[i] % 2 === numbers[i-1] % 2) return false;
+            }
+            return true;
+        }
+        
+        function isSnake(numbers) {
+            if (numbers.length < 5) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                const diff = Math.abs(numbers[i] - numbers[i-1]);
+                if (diff !== 1 && diff !== 9) return false;
+            }
+            return true;
+        }
+        
+        function isBlock(numbers) {
+            if (numbers.length < 3) return false;
+            const first = numbers[0] <= 4 ? 'S' : 'B';
+            for (let i = 1; i < numbers.length; i++) {
+                if ((numbers[i] <= 4 ? 'S' : 'B') !== first) return false;
+            }
+            return true;
+        }
+        
+        // Add the remaining pattern detection functions...
+        function isLadder(numbers) {
+            if (numbers.length < 4) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                if (numbers[i] <= numbers[i-1]) return false;
+            }
+            return true;
+        }
+        
+        function isCross(numbers) {
+            if (numbers.length < 5) return false;
+            const mid = Math.floor(numbers.length / 2);
+            for (let i = 0; i < mid; i++) {
+                if (numbers[i] !== numbers[numbers.length - 1 - i]) return false;
+            }
+            return numbers[mid] === numbers[0] + 1;
+        }
+        
+        function isBackToBack(numbers) {
+            if (numbers.length < 4) return false;
+            for (let i = 2; i < numbers.length; i++) {
+                if (numbers[i] !== numbers[i-2]) return false;
+            }
+            return true;
+        }
+        
+        function isStepUp(numbers) {
+            if (numbers.length < 3) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                if (numbers[i] - numbers[i-1] !== 1) return false;
+            }
+            return true;
+        }
+        
+        function isStepDown(numbers) {
+            if (numbers.length < 3) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                if (numbers[i] - numbers[i-1] !== -1) return false;
+            }
+            return true;
+        }
+        
+        // Add the remaining pattern detection functions...
+        function isMirrorZigzag(numbers) {
+            if (numbers.length < 6) return false;
+            const firstHalf = numbers.slice(0, 3);
+            const secondHalf = numbers.slice(3, 6).reverse();
+            for (let i = 0; i < 3; i++) {
+                if (firstHalf[i] !== secondHalf[i]) return false;
+            }
+            return isZigZag(numbers.slice(0, 3));
+        }
+        
+        function isTripleDouble(numbers) {
+            if (numbers.length < 5) return false;
+            return isDouble(numbers.slice(0, 2)) && 
+                   isDouble(numbers.slice(2, 4)) && 
+                   numbers[0] !== numbers[2];
+        }
+        
+        function isRandomBreak(numbers) {
+            if (numbers.length < 4) return false;
+            let changes = 0;
+            const firstType = numbers[0] <= 4 ? 'S' : 'B';
+            for (let i = 1; i < numbers.length; i++) {
+                const currentType = numbers[i] <= 4 ? 'S' : 'B';
+                if (currentType !== firstType) changes++;
+            }
+            return changes >= 2 && changes <= numbers.length - 2;
+        }
+        
+        function isColorLoop(numbers) {
+            if (numbers.length < 6) return false;
+            let colorChanges = 0;
+            let lastColor = numbers[0] <= 4 ? 'S' : 'B';
+            for (let i = 1; i < numbers.length; i++) {
+                const currentColor = numbers[i] <= 4 ? 'S' : 'B';
+                if (currentColor !== lastColor) {
+                    colorChanges++;
+                    lastColor = currentColor;
+                }
+            }
+            return colorChanges >= numbers.length - 2;
+        }
+        
+        // Add the remaining pattern detection functions...
+        function isShiftLeft(numbers) {
+            if (numbers.length < 4) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                if (numbers[i] !== (numbers[i-1] + 1) % 10) return false;
+            }
+            return true;
+        }
+        
+        function isShiftRight(numbers) {
+            if (numbers.length < 4) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                if (numbers[i] !== (numbers[i-1] - 1 + 10) % 10) return false;
+            }
+            return true;
+        }
+        
+        function isCenterLock(numbers) {
+            if (numbers.length < 5) return false;
+            const center = numbers[2];
+            for (let i = 0; i < numbers.length; i++) {
+                if (i !== 2 && numbers[i] !== center) return false;
+            }
+            return true;
+        }
+        
+        function isHalfHalf(numbers) {
+            if (numbers.length < 4) return false;
+            const half = Math.floor(numbers.length / 2);
+            const firstHalf = numbers.slice(0, half);
+            const secondHalf = numbers.slice(half);
+            const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+            const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+            return Math.abs(firstAvg - secondAvg) >= 4;
+        }
+        
+        // Add the remaining pattern detection functions...
+        function isPatternCut(numbers) {
+            if (numbers.length < 4) return false;
+            const firstHalf = numbers.slice(0, 2);
+            const secondHalf = numbers.slice(2, 4);
+            return (firstHalf[0] === secondHalf[1] && firstHalf[1] === secondHalf[0]);
+        }
+        
+        function isEdgeRepeat(numbers) {
+            if (numbers.length < 4) return false;
+            return numbers[0] === numbers[numbers.length - 1];
+        }
+        
+        function isForwardMirror(numbers) {
+            if (numbers.length < 6) return false;
+            const firstHalf = numbers.slice(0, 3);
+            const secondHalf = numbers.slice(3, 6);
+            for (let i = 0; i < 3; i++) {
+                if (firstHalf[i] !== secondHalf[2 - i]) return false;
+            }
+            return true;
+        }
+        
+        function isDiamond(numbers) {
+            if (numbers.length < 5) return false;
+            const mid = Math.floor(numbers.length / 2);
+            for (let i = 0; i < mid; i++) {
+                if (numbers[i] !== numbers[numbers.length - 1 - i]) return false;
+            }
+            return numbers[0] + 1 === numbers[mid] && numbers[mid] + 1 === numbers[numbers.length - 1];
+        }
+        
+        function isSideFlip(numbers) {
+            if (numbers.length < 4) return false;
+            return numbers[0] === numbers[2] && numbers[1] === numbers[3];
+        }
+        
+        // Add the remaining pattern detection functions...
+        function isLongHold(numbers) {
+            if (numbers.length < 5) return false;
+            const first = numbers[0];
+            for (let i = 1; i < numbers.length; i++) {
+                if (numbers[i] !== first) return false;
+            }
+            return true;
+        }
+        
+        function isTimeJump(numbers) {
+            if (numbers.length < 4) return false;
+            for (let i = 1; i < numbers.length; i++) {
+                if (Math.abs(numbers[i] - numbers[i-1]) < 3) return false;
+            }
+            return true;
+        }
+        
+        function isDelayedRepeat(numbers) {
+            if (numbers.length < 5) return false;
+            return numbers[0] === numbers[2] && numbers[1] === numbers[3] && numbers[0] !== numbers[1];
+        }
+        
+        function isFourSet(numbers) {
+            if (numbers.length < 4) return false;
+            const set = new Set(numbers.slice(0, 4));
+            return set.size === 4;
+        }
+        
+        function updatePatternCell(issue, pattern) {
+            const cell = document.getElementById(`pattern-${issue}`);
+            if (cell) {
+                cell.textContent = pattern;
+            }
         }
     </script>
 </body>
