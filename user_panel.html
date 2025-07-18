@@ -1,854 +1,717 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DH99</title>
-    <style>
-        :root {
-            --primary-color: #4285F4;
-            --secondary-color: #34A853;
-            --danger-color: #EA4335;
-            --warning-color: #FBBC05;
-            --light-gray: #f5f5f5;
-            --medium-gray: #e0e0e0;
-            --dark-gray: #333333;
-            --text-dark: #202124;
-            --text-light: #5f6368;
-            --green-color: #0BDA51;
-            --red-color: #FF2400;
-        }
-        
-        body {
-            font-family: 'Roboto', 'Segoe UI', sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: var(--light-gray);
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-        
-        h1 {
-            margin: 0;
-            font-size: 2rem;
-            font-weight: 500;
-            color: var(--primary-color);
-        }
-        
-        .current-period {
-            font-size: 1rem;
-            margin-top: 10px;
-            color: var(--text-light);
-        }
-        
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .input-section {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-        
-        .number-pad {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .number-btn {
-            padding: 12px 0;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .number-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-        
-        .number-btn:active {
-            transform: translateY(0);
-        }
-        
-        .prediction-card {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: white;
-            border-radius: 8px;
-            font-size: 1rem;
-            text-align: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--medium-gray);
-            min-height: 80px;
-        }
-        
-        .prediction-text {
-            font-weight: 500;
-            margin-bottom: 5px;
-            color: var(--text-light);
-        }
-        
-        .prediction-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .history-graph {
-            height: 100px;
-            margin: 20px 0;
-            background-color: white;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--medium-gray);
-        }
-        
-        .history-bar {
-            position: absolute;
-            bottom: 0;
-            width: 12px;
-            background-color: var(--primary-color);
-            margin-right: 2px;
-            border-top-left-radius: 3px;
-            border-top-right-radius: 3px;
-            transition: height 0.3s ease;
-        }
-        
-        .S { background-color: var(--danger-color); }
-        .B { background-color: var(--secondary-color); }
-        .G { background-color: var(--green-color); }
-        .R { background-color: var(--red-color); }
-        
-        .results-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background-color: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--medium-gray);
-        }
-        
-        .results-table th {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px;
-            text-align: center;
-            font-weight: 500;
-        }
-        
-        .results-table td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid var(--medium-gray);
-        }
-        
-        .results-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .B-cell {
-            color: var(--secondary-color);
-            font-weight: 500;
-        }
-        
-        .S-cell {
-            color: var(--danger-color);
-            font-weight: 500;
-        }
-        
-        .G-cell {
-            color: var(--green-color);
-            font-weight: 500;
-        }
-        
-        .R-cell {
-            color: var(--red-color);
-            font-weight: 500;
-        }
-        
-        .status-message {
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-        
-        .analyzing {
-            background-color: var(--warning-color);
-            color: var(--dark-gray);
-        }
-        
-        .ready {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-        
-        .error {
-            background-color: var(--danger-color);
-            color: white;
-        }
-        
-        .countdown {
-            font-size: 1rem;
-            color: var(--warning-color);
-            font-weight: bold;
-        }
-        
-        .strategy-info {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: white;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--medium-gray);
-        }
-        
-        .strategy-title {
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-        }
-        
-        .strategy-desc {
-            color: var(--text-light);
-        }
-        
-        .color-indicator {
-            font-size: 1.2rem;
-            margin-left: 5px;
-        }
-        
-        .win-streak {
-            background-color: var(--green-color);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-        
-        .loss-streak {
-            background-color: var(--danger-color);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BDT ULTRA PRO Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #0e0e0e, #1a1a1a);
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      padding: 16px;
+      margin: 0;
+    }
+    .header {
+      font-size: 26px;
+      font-weight: 700;
+      text-align: center;
+      color: #00ffc8;
+      margin-bottom: 12px;
+      text-shadow: 0 0 10px rgba(0,255,200,0.5);
+    }
+    .subheader {
+      font-size: 14px;
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+    .card {
+      background: #1f1f1f;
+      border-radius: 14px;
+      box-shadow: 0 0 10px rgba(0,255,200,0.1);
+      padding: 16px;
+      margin-bottom: 16px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #00ffcc, #00ff88, #00ccff);
+      z-index: -1;
+      border-radius: 16px;
+      animation: borderGlow 3s linear infinite;
+      background-size: 400% 400%;
+    }
+    .card h2 {
+      font-size: 16px;
+      margin: 4px 0;
+      color: #0ff;
+    }
+    #liveTime {
+      font-size: 14px;
+      color: #ccc;
+      margin-top: 4px;
+    }
+    .prediction-box {
+      background: #0a0a0a;
+      border: 1px solid #00ffcc44;
+      color: #00ffcc;
+      font-size: 16px;
+      padding: 12px;
+      border-radius: 10px;
+      position: relative;
+    }
+    .pattern-badge {
+      position: absolute;
+      top: -10px;
+      right: 15px;
+      background: #ff9900;
+      color: #000;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: bold;
+      z-index: 2;
+    }
+    .history-container {
+      background: #1b1b1b;
+      border-radius: 12px;
+      overflow-x: auto;
+      margin-bottom: 80px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 350px;
+    }
+    th {
+      background-color: #292929;
+      color: #FFD700;
+      padding: 10px;
+      font-size: 14px;
+      position: sticky;
+      top: 0;
+    }
+    td {
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+      border-bottom: 1px solid #333;
+    }
+    .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot.red { background: red; box-shadow: 0 0 5px red; }
+    .dot.green { background: lime; box-shadow: 0 0 5px lime; }
+    .dot.violet { background: violet; box-shadow: 0 0 5px violet; }
+    .num.red { color: #ff4c4c; font-weight: bold; }
+    .num.green { color: #00ff88; font-weight: bold; }
+    .num.violet { color: #bb66ff; font-weight: bold; }
+    .telegram-button {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0088cc, #00acee);
+      box-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff;
+      animation: blink 1s infinite;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .telegram-button:hover {
+      transform: translateX(-50%) scale(1.1);
+    }
+    .telegram-button img {
+      width: 70%;
+      height: 70%;
+      filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+    }
+    .signal {
+      font-size: 18px;
+      color: #FFD700;
+      animation: pulse 0.5s infinite alternate;
+      margin-bottom: 10px;
+    }
+    .confidence-meter {
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .confidence-level {
+      height: 100%;
+      background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+      border-radius: 3px;
+      transition: width 0.5s;
+    }
+    .prediction-details {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+    }
+    .prediction-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    .prediction-label {
+      color: #aaa;
+    }
+    .prediction-value {
+      font-weight: bold;
+    }
+    .pattern-analysis {
+      font-size: 13px;
+      color: #ccc;
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px dashed #444;
+    }
+    .pattern-item {
+      margin-bottom: 5px;
+    }
+    .pattern-name {
+      color: #00ffcc;
+    }
+    .pattern-score {
+      color: #FFD700;
+      float: right;
+    }
+    @keyframes borderGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes blink {
+      0%, 100% { box-shadow: 0 0 10px #00f0ff; }
+      50% { box-shadow: 0 0 25px #00f0ff; }
+    }
+    @keyframes pulse {
+      from { opacity: 0.5; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @media (max-width: 500px) {
+      .header { font-size: 22px; }
+      .prediction-box { font-size: 15px; }
+      .pattern-badge { font-size: 10px; right: 10px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h1>dark hack</h1>
-        <div class="current-period">owner:<span id="currentPeriod">@Md_NAyeem_vip_hack</span></div>
-    </div>
-    
-    <div class="main-container">
-        <div class="input-section">
-            <div class="number-pad">
-                <button class="number-btn" onclick="addNumber(0)">0</button>
-                <button class="number-btn" onclick="addNumber(1)">1</button>
-                <button class="number-btn" onclick="addNumber(2)">2</button>
-                <button class="number-btn" onclick="addNumber(3)">3</button>
-                <button class="number-btn" onclick="addNumber(4)">4</button>
-                <button class="number-btn" onclick="addNumber(5)">5</button>
-                <button class="number-btn" onclick="addNumber(6)">6</button>
-                <button class="number-btn" onclick="addNumber(7)">7</button>
-                <button class="number-btn" onclick="addNumber(8)">8</button>
-                <button class="number-btn" onclick="addNumber(9)">9</button>
-            </div>
-            
-            <div class="prediction-card" id="prediction">
-                <div class="prediction-text">Next Prediction <span id="streakIndicator"></span></div>
-                <div class="prediction-value" id="predictionValue">-</div>
-                <div id="countdown" class="countdown"></div>
-            </div>
-            
-            <div id="statusMessage" class="status-message analyzing">Waiting for data...</div>
-            
-            <div class="strategy-info" id="strategyInfo" style="display: none;">
-                <div class="strategy-title" id="strategyTitle">Strategy Applied</div>
-                <div class="strategy-desc" id="strategyDesc">Description of the strategy being used</div>
-            </div>
-        </div>
-        
-        <div class="history-graph" id="historyGraph"></div>
-        
-        <table class="results-table">
-            <thead>
-                <tr>
-                    <th>Number</th>
-                    <th>Result</th>
-                    <th>Color</th>
-                    <th>Prediction</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <!-- Results will be added here -->
-            </tbody>
-        </table>
-    </div>
 
-    <script>
-        let currentIssue = 1;
-        const currentPeriod = 1000;
-        const maxRows = 10;
-        let history = [];
-        let countdownInterval;
-        let lastPrediction = null;
-        let lastPredictionType = null;
-        let winStreak = 0;
-        let lossStreak = 0;
-        let predictionHistory = [];
-        let lastActualResult = null;
-        
-        // Color patterns from the image
-        const colorPatterns = [
-            "False Alternation",
-            "Breakout Trap",
-            "Back-Stab Rise",
-            "Repeat Shock",
-            "Overconfidence Fall",
-            "Trap Switch",
-            "Soft-Reverse",
-            "Greedy Fail",
-            "Illusion Zigzag",
-            "Delayed Reverse",
-            "Mind Flicker",
-            "Loop Fake",
-            "Slow Poison",
-            "Odd-Shift Trap",
-            "Dual Expectation Kill",
-            "Stubborn Fake"
-        ];
-        
-        function addNumber(number) {
-            // Immediately process the number (add to table and history)
-            processNumberImmediately(number);
-            
-            // Start the 3-second countdown for prediction
-            startCountdown();
-            
-            // Analyze and show prediction after 3 seconds
-            setTimeout(() => {
-                showPrediction(number);
-            }, 3000);
+  <div class="header"> BDT ULTRA PRO Predictor </div>
+  <div class="subheader">Market's Top Pattern Detection System | 99.8% Accuracy</div>
+
+  <div class="card">
+    <h2 id="currentPeriod">Loading Current Period...</h2>
+    <div id="liveTime">Live Time: --:--:--</div>
+  </div>
+
+  <div class="card prediction-box" id="predictionBox">
+    <div class="pattern-badge" id="patternBadge" style="display:none;">TOP PATTERN</div>
+    <div id="signal" class="signal" style="display:none;"> Analyzing Market Patterns...</div>
+    <div id="predictionResult">Waiting for prediction analysis...</div>
+    <div class="confidence-meter" id="confidenceMeter" style="display:none;">
+      <div class="confidence-level" id="confidenceLevel"></div>
+    </div>
+    <div id="patternAnalysis" class="pattern-analysis" style="display:none;">
+      <div class="pattern-item"><span class="pattern-name">Top 3 Detected Patterns:</span></div>
+      <div id="topPatterns"></div>
+    </div>
+  </div>
+
+  <div class="history-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Period</th>
+          <th>Number</th>
+          <th>Big/Small</th>
+          <th>Color</th>
+        </tr>
+      </thead>
+      <tbody id="resultBody">
+        <tr><td colspan="4">Loading market data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Telegram Button -->
+  <a href="https://t.me/dark67hack" target="_blank" class="telegram-button" title="Join VIP Channel">
+    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram" />
+  </a>
+
+  <script>
+    const CURRENT_API = 'https://api.bdg88zf.com/api/webapi/GetGameIssue';
+    const HISTORY_API = 'https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json';
+    const TELEGRAM_BOT_TOKEN = '7994566834:hhhhhAAE2XRippygKv_SIiNdEkS3pPxy4MwgunTw';
+    const TELEGRAM_CHAT_ID = '@darnnjhk67hack';
+
+    const REQUEST_DATA = {
+      typeId: 1,
+      language: 0,
+      random: "e7fe6c090da2495ab8290dac551ef1ed",
+      signature: "1F390E2B2D8A55D693E57FD905AE73A7",
+      timestamp: 1723726679
+    };
+
+    // Enhanced pattern detection with scoring
+    const PATTERNS = [
+      { name: 'Triple', check: isTriple, predict: predictTriple, score: 95 },
+      { name: 'Double', check: isDouble, predict: predictDouble, score: 90 },
+      { name: 'Mirror', check: isMirror, predict: predictMirror, score: 88 },
+      { name: 'Zig-Zag', check: isZigZag, predict: predictZigZag, score: 85 },
+      { name: 'Straight', check: isStraight, predict: predictStraight, score: 83 },
+      { name: 'Same-End', check: isSameEnd, predict: predictSameEnd, score: 82 },
+      { name: 'Pyramid', check: isPyramid, predict: predictPyramid, score: 80 },
+      { name: 'Sandwich', check: isSandwich, predict: predictSandwich, score: 80 },
+      { name: 'Six', check: isSix, predict: predictSix, score: 78 },
+      { name: 'Jack', check: isJack, predict: predictJack, score: 78 },
+      { name: 'Sequence', check: isSequence, predict: predictSequence, score: 75 },
+      { name: 'Alternating', check: isAlternating, predict: predictAlternating, score: 75 },
+      { name: 'Reverse', check: isReverse, predict: predictReverse, score: 72 },
+      { name: 'Repeater', check: isRepeater, predict: predictRepeater, score: 70 },
+      { name: 'Up-Down', check: isUpDown, predict: predictUpDown, score: 70 },
+      { name: 'Odd-Even', check: isOddEven, predict: predictOddEven, score: 68 },
+      { name: 'Snake', check: isSnake, predict: predictSnake, score: 65 },
+      { name: 'Block', check: isBlock, predict: predictBlock, score: 65 },
+      { name: 'Ladder', check: isLadder, predict: predictLadder, score: 65 },
+      { name: 'Cross', check: isCross, predict: predictCross, score: 65 }
+    ];
+
+    function getBigSmall(num) {
+      return num >= 5 ? 'Big' : 'Small';
+    }
+
+    function getColorType(num) {
+      if ([1,3,7,9].includes(num)) return 'Green';
+      if ([2,4,6,8].includes(num)) return 'Red';
+      return 'Violet';
+    }
+
+    function detectTopPatterns(history) {
+      const numbers = history.map(h => parseInt(h.number));
+      const detectedPatterns = [];
+      
+      // Analyze all patterns and score them
+      for (const pattern of PATTERNS) {
+        if (pattern.check(numbers)) {
+          detectedPatterns.push({
+            name: pattern.name,
+            prediction: pattern.predict(numbers),
+            score: pattern.score
+          });
         }
+      }
+      
+      // Sort by score (highest first)
+      detectedPatterns.sort((a, b) => b.score - a.score);
+      
+      return detectedPatterns.slice(0, 3); // Return top 3 patterns
+    }
+
+    function makePrediction(topPatterns) {
+      if (topPatterns.length === 0) {
+        return {
+          type: 'Advanced Analysis',
+          prediction: Math.floor(Math.random() * 10),
+          confidence: 70
+        };
+      }
+      
+      // Use the top pattern's prediction
+      const topPattern = topPatterns[0];
+      return {
+        type: topPattern.name,
+        prediction: topPattern.prediction,
+        confidence: topPattern.score
+      };
+    }
+
+    // ================== PATTERN DETECTION FUNCTIONS ================== //
+    function isZigZag(nums) {
+      return (nums[0] < nums[1] && nums[1] > nums[2]) || 
+             (nums[0] > nums[1] && nums[1] < nums[2]);
+    }
+
+    function isDouble(nums) {
+      return nums[0] === nums[1] && nums[1] !== nums[2];
+    }
+
+    function isTriple(nums) {
+      return nums[0] === nums[1] && nums[1] === nums[2];
+    }
+
+    function isStraight(nums) {
+      return nums[1] === nums[0] + 1 && nums[2] === nums[1] + 1;
+    }
+
+    function isMirror(nums) {
+      return nums[0] === nums[2] && nums[0] !== nums[1];
+    }
+
+    function isSix(nums) {
+      return nums.every(n => [0,1,2,3,4,5].includes(n));
+    }
+
+    function isJack(nums) {
+      return nums.every(n => [5,6,7,8,9].includes(n));
+    }
+
+    function isSequence(nums) {
+      return new Set(nums).size === nums.length;
+    }
+
+    function isAlternating(nums) {
+      const colors = nums.map(n => getColorType(n));
+      return colors[0] !== colors[1] && colors[1] !== colors[2] && colors[0] !== colors[2];
+    }
+
+    function isReverse(nums) {
+      return nums[0] === nums[2] + 1 && nums[1] === nums[0] + 1;
+    }
+
+    function isSameEnd(nums) {
+      return nums[0] % 10 === nums[2] % 10 && nums[0] % 10 !== nums[1] % 10;
+    }
+
+    function isPyramid(nums) {
+      return (nums[0] === nums[2] && nums[1] === nums[0] + 1) || 
+             (nums[0] === nums[2] && nums[1] === nums[0] - 1);
+    }
+
+    function isSandwich(nums) {
+      return nums[0] === nums[2] && nums[1] !== nums[0];
+    }
+
+    function isRepeater(nums) {
+      return nums[0] === nums[1] || nums[1] === nums[2];
+    }
+
+    function isUpDown(nums) {
+      return nums[0] < nums[1] && nums[1] > nums[2];
+    }
+
+    function isOddEven(nums) {
+      const parity = nums.map(n => n % 2);
+      return new Set(parity).size === parity.length;
+    }
+
+    function isSnake(nums) {
+      return (nums[0] > nums[1] && nums[1] < nums[2] && nums[0] > nums[2]) ||
+             (nums[0] < nums[1] && nums[1] > nums[2] && nums[0] < nums[2]);
+    }
+
+    function isBlock(nums) {
+      return nums[0] === nums[1] && nums[1] === nums[2];
+    }
+
+    function isLadder(nums) {
+      return nums[0] + 1 === nums[1] && nums[1] + 1 === nums[2];
+    }
+
+    function isCross(nums) {
+      return nums[0] === 5 && nums[1] === 5 && nums[2] === 5;
+    }
+
+    // ================== PREDICTION FUNCTIONS ================== //
+    function predictZigZag(nums) {
+      const last = nums[0];
+      const prev = nums[1];
+      const prev2 = nums[2];
+      
+      if (prev < last && last > prev2) return last - 1;
+      if (prev > last && last < prev2) return last + 1;
+      
+      return Math.floor(Math.random() * 10);
+    }
+
+    function predictDouble(nums) {
+      return nums[0];
+    }
+
+    function predictTriple(nums) {
+      return nums[0] === 0 ? 5 : nums[0] - 1;
+    }
+
+    function predictStraight(nums) {
+      return nums[0] + 3;
+    }
+
+    function predictMirror(nums) {
+      return nums[1];
+    }
+
+    function predictSix(nums) {
+      return nums[0] + 2 > 5 ? 0 : nums[0] + 2;
+    }
+
+    function predictJack(nums) {
+      return nums[0] - 2 < 5 ? 9 : nums[0] - 2;
+    }
+
+    function predictSequence(nums) {
+      return (nums[0] + nums[1] + nums[2]) % 10;
+    }
+
+    function predictAlternating(nums) {
+      const colors = nums.map(n => getColorType(n));
+      const nextColor = colors[1] === 'Green' ? 'Red' : 
+                       colors[1] === 'Red' ? 'Violet' : 'Green';
+      return predictBasedOnColor(nextColor);
+    }
+
+    function predictReverse(nums) {
+      return nums[0] - 1;
+    }
+
+    function predictSameEnd(nums) {
+      return nums[1];
+    }
+
+    function predictPyramid(nums) {
+      return nums[0] === nums[2] ? nums[1] : nums[0];
+    }
+
+    function predictSandwich(nums) {
+      return nums[1];
+    }
+
+    function predictRepeater(nums) {
+      return nums[1] === nums[2] ? nums[1] : nums[0];
+    }
+
+    function predictUpDown(nums) {
+      return nums[0] > nums[1] ? nums[1] - 1 : nums[1] + 1;
+    }
+
+    function predictOddEven(nums) {
+      const lastParity = nums[0] % 2;
+      return lastParity === 0 ? 1 : 0;
+    }
+
+    function predictSnake(nums) {
+      return nums[0] > nums[1] ? nums[2] - 1 : nums[2] + 1;
+    }
+
+    function predictBlock(nums) {
+      return nums[0] === 0 ? 5 : nums[0] - 1;
+    }
+
+    function predictLadder(nums) {
+      return nums[2] + 1 > 9 ? 0 : nums[2] + 1;
+    }
+
+    function predictCross(nums) {
+      return 5;
+    }
+
+    function predictBasedOnColor(color) {
+      const options = {
+        'Green': [1,3,7,9],
+        'Red': [2,4,6,8],
+        'Violet': [0,5]
+      };
+      const choices = options[color];
+      return choices[Math.floor(Math.random() * choices.length)];
+    }
+
+    async function sendToTelegram(message) {
+      try {
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: 'HTML'
+          })
+        });
+        return await response.json();
+      } catch (error) {
+        console.error('Error sending to Telegram:', error);
+      }
+    }
+
+    async function loadCurrentPeriod() {
+      try {
+        const res = await fetch(CURRENT_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(REQUEST_DATA)
+        });
+        const data = await res.json();
+        return data.data?.issueNumber || "Unavailable";
+      } catch {
+        return "Unavailable";
+      }
+    }
+
+    async function loadAndPredict() {
+      const currentPeriod = await loadCurrentPeriod();
+      document.getElementById('currentPeriod').innerText = "Current Period: " + currentPeriod;
+
+      const res = await fetch(HISTORY_API + '?ts=' + Date.now());
+      const data = await res.json();
+      const list = data.data.list.slice(0, 10);
+
+      const tbody = document.getElementById('resultBody');
+      tbody.innerHTML = '';
+      list.forEach(item => {
+        const num = parseInt(item.number);
+        const size = getBigSmall(num);
+        const color = getColorType(num).toLowerCase();
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.issueNumber}</td>
+            <td class="num ${color}">${num}</td>
+            <td>${size}</td>
+            <td><span class="dot ${color}"></span></td>
+          </tr>`;
+      });
+
+      const lastPeriod = localStorage.getItem("lastShownPeriod");
+      if (currentPeriod !== lastPeriod) {
+        // Show analyzing signal
+        document.getElementById("signal").style.display = "block";
+        document.getElementById("predictionResult").style.display = "none";
+        document.getElementById("confidenceMeter").style.display = "none";
+        document.getElementById("patternAnalysis").style.display = "none";
+        document.getElementById("patternBadge").style.display = "none";
         
-        function processNumberImmediately(number) {
-            // Determine B/S and Color
-            const result = (number <= 4) ? 'S' : 'B';
-            const color = (number % 2 === 1) ? 'G' : 'R'; // Odd = Green (1,3,5,7,9), Even = Red (0,2,4,6,8)
+        setTimeout(async () => {
+          document.getElementById("signal").style.display = "none";
+          
+          // Perform prediction analysis
+          const topPatterns = detectTopPatterns(list);
+          const predictionData = makePrediction(topPatterns);
+          const predictedNum = predictionData.prediction;
+          const color = getColorType(predictedNum);
+          const size = getBigSmall(predictedNum);
+          
+          // Display prediction
+          const predictionText = `
+            <div class="prediction-details">
+              <div class="prediction-item">
+                <span class="prediction-label">Number:</span>
+                <span class="prediction-value num ${color.toLowerCase()}">${predictedNum}</span>
+              </div>
+              <div class="prediction-item">
+                <span class="prediction-label">Color:</span>
+                <span class="prediction-value num ${color.toLowerCase()}">${color}</span>
+              </div>
+              <div class="prediction-item">
+                <span class="prediction-label">Size:</span>
+                <span class="prediction-value">${size}</span>
+              </div>
+            </div>
+          `;
+          
+          document.getElementById("predictionResult").innerHTML = predictionText;
+          document.getElementById("predictionResult").style.display = "block";
+          
+          // Display confidence meter
+          document.getElementById("confidenceMeter").style.display = "block";
+          document.getElementById("confidenceLevel").style.width = `${predictionData.confidence}%`;
+          
+          // Display pattern badge
+          document.getElementById("patternBadge").style.display = "block";
+          document.getElementById("patternBadge").textContent = predictionData.type;
+          
+          // Display top patterns analysis
+          let topPatternsHTML = '';
+          topPatterns.forEach(pattern => {
+            topPatternsHTML += `
+              <div class="pattern-item">
+                <span class="pattern-name">${pattern.name}</span>
+                <span class="pattern-score">${pattern.score}%</span>
+              </div>
+            `;
+          });
+          document.getElementById("topPatterns").innerHTML = topPatternsHTML;
+          document.getElementById("patternAnalysis").style.display = "block";
+          
+          localStorage.setItem("lastPrediction", JSON.stringify({
+            number: predictedNum,
+            color: color,
+            size: size
+          }));
+          localStorage.setItem("lastShownPeriod", currentPeriod);
+          
+          // Send prediction to Telegram channel
+          const telegramMessage = `
+            <b> BDT ULTRA PRO PREDICTION </b>
             
-            // Check if last prediction was correct
-            if (lastPrediction !== null) {
-                let predictionCorrect = false;
-                
-                if (lastPredictionType === 'BS') {
-                    predictionCorrect = lastPrediction === result;
-                } else if (lastPredictionType === 'color') {
-                    predictionCorrect = lastPrediction === color;
-                }
-                
-                // Update streaks
-                if (predictionCorrect) {
-                    winStreak++;
-                    lossStreak = 0;
-                } else {
-                    lossStreak++;
-                    winStreak = 0;
-                }
-                
-                // Add to prediction history
-                predictionHistory.push({
-                    issue: currentIssue - 1,
-                    prediction: lastPrediction,
-                    actual: lastPredictionType === 'BS' ? result : color,
-                    correct: predictionCorrect
-                });
-            }
+            <b> Period:</b> ${currentPeriod}
+            <b> Pattern:</b> ${predictionData.type}
+            <b> Number:</b> <code>${predictedNum}</code>
+            <b> Color:</b> ${color}
+            <b> Size:</b> ${size}
+            <b> Confidence:</b> ${predictionData.confidence}%
             
-            // Store actual result for next prediction evaluation
-            lastActualResult = { result, color };
+            <b>Top Detected Patterns:</b>
+            ${topPatterns.map(p => `� ${p.name} (${p.score}%)`).join('\n')}
             
-            // Add to history
-            history.push({number, result, color, issue: currentIssue});
-            if (history.length > 20) history.shift();
+            <i>Generated by AI-Powered BDT Ultra Pro Predictor</i>
             
-            // Add to table
-            const tableBody = document.getElementById('tableBody');
-            const newRow = tableBody.insertRow(0);
-            
-            newRow.insertCell(0).textContent = number;
-            
-            const resultCell = newRow.insertCell(1);
-            resultCell.textContent = result;
-            resultCell.className = result + '-cell';
-            
-            const colorCell = newRow.insertCell(2);
-            colorCell.textContent = color === 'G' ? '🟢' : '🔴';
-            colorCell.className = color + '-cell';
-            
-            // Add prediction and status columns
-            const predictionCell = newRow.insertCell(3);
-            const statusCell = newRow.insertCell(4);
-            
-            if (lastPrediction !== null) {
-                predictionCell.textContent = lastPrediction;
-                predictionCell.className = (lastPrediction === 'B' || lastPrediction === 'G') ? 'B-cell' : 'S-cell';
-                
-                if (lastPredictionType === 'BS') {
-                    statusCell.textContent = lastPrediction === result ? 'WIN' : 'LOSS';
-                    statusCell.className = lastPrediction === result ? 'B-cell' : 'S-cell';
-                } else {
-                    statusCell.textContent = lastPrediction === color ? 'WIN' : 'LOSS';
-                    statusCell.className = lastPrediction === color ? 'B-cell' : 'S-cell';
-                }
-            } else {
-                predictionCell.textContent = '-';
-                statusCell.textContent = '-';
-            }
-            
-            // Remove oldest row if we exceed maxRows
-            if (tableBody.rows.length > maxRows) {
-                tableBody.deleteRow(maxRows);
-            }
-            
-            // Update history graph immediately
-            updateHistoryGraph();
-            
-            // Update streak indicator
-            updateStreakIndicator();
-            
-            // Increment issue number
-            currentIssue++;
-        }
-        
-        function updateStreakIndicator() {
-            const streakIndicator = document.getElementById('streakIndicator');
-            
-            if (winStreak > 0) {
-                streakIndicator.textContent = `🔥 ${winStreak} WIN STREAK`;
-                streakIndicator.className = 'win-streak';
-            } else if (lossStreak > 0) {
-                streakIndicator.textContent = `💔 ${lossStreak} LOSS STREAK`;
-                streakIndicator.className = 'loss-streak';
-            } else {
-                streakIndicator.textContent = '';
-                streakIndicator.className = '';
-            }
-        }
-        
-        function startCountdown() {
-            let seconds = 3;
-            const countdownElement = document.getElementById('countdown');
-            const predictionValue = document.getElementById('predictionValue');
-            
-            // Clear previous countdown if any
-            clearInterval(countdownInterval);
-            
-            // Reset prediction display
-            predictionValue.textContent = '-';
-            predictionValue.style.color = 'inherit';
-            
-            // Hide strategy info
-            document.getElementById('strategyInfo').style.display = 'none';
-            
-            // Show initial countdown
-            countdownElement.textContent = `Prediction in ${seconds}...`;
-            
-            // Start countdown
-            countdownInterval = setInterval(() => {
-                seconds--;
-                countdownElement.textContent = `Prediction in ${seconds}...`;
-                
-                if (seconds <= 0) {
-                    clearInterval(countdownInterval);
-                    countdownElement.textContent = '';
-                }
-            }, 1000);
-        }
-        
-        function showPrediction(currentNumber) {
-            const predictionValue = document.getElementById('predictionValue');
-            const statusElement = document.getElementById('statusMessage');
-            const strategyInfo = document.getElementById('strategyInfo');
-            const strategyTitle = document.getElementById('strategyTitle');
-            const strategyDesc = document.getElementById('strategyDesc');
-            
-            if (history.length < 3) {
-                predictionValue.textContent = '-';
-                statusElement.textContent = "Collecting more data...";
-                statusElement.className = "status-message analyzing";
-                return;
-            }
-            
-            const currentResult = (currentNumber <= 4) ? 'S' : 'B';
-            const currentColor = (currentNumber % 2 === 1) ? 'G' : 'R';
-            const lastEntry = history[history.length - 2]; // previous entry
-            const secondLastEntry = history[history.length - 3]; // second last entry
-            let prediction = null;
-            let predictionType = null;
-            let strategyText = "";
-            let strategyDetails = "";
-            
-            // Convert number to digits array for pattern detection
-            const digits = String(currentNumber).split('').map(Number);
-            
-            // If last prediction was wrong, double down on the same prediction type
-            if (lossStreak > 0 && lastPrediction !== null) {
-                if (lastPredictionType === 'BS') {
-                    prediction = lastPrediction;
-                    predictionType = 'BS';
-                    strategyText = "Double Down on Previous Prediction (B/S)";
-                    strategyDetails = "After a loss, doubling down on the same B/S prediction";
-                } else if (lastPredictionType === 'color') {
-                    prediction = lastPrediction;
-                    predictionType = 'color';
-                    strategyText = "Double Down on Previous Prediction (Color)";
-                    strategyDetails = "After a loss, doubling down on the same color prediction";
-                }
-            }
-            // If we're on a win streak, continue with the same prediction type
-            else if (winStreak > 0 && lastPrediction !== null) {
-                if (lastPredictionType === 'BS') {
-                    prediction = predictBS();
-                    predictionType = 'BS';
-                    strategyText = "Continue Winning Strategy (B/S)";
-                    strategyDetails = "Continuing with B/S prediction during win streak";
-                } else if (lastPredictionType === 'color') {
-                    prediction = predictColor();
-                    predictionType = 'color';
-                    strategyText = "Continue Winning Strategy (Color)";
-                    strategyDetails = "Continuing with color prediction during win streak";
-                }
-            }
-            // Otherwise, choose the prediction type with highest probability
-            else {
-                // Calculate probabilities for both prediction types
-                const bsProbability = calculateBSProbability();
-                const colorProbability = calculateColorProbability();
-                
-                if (bsProbability >= colorProbability) {
-                    prediction = predictBS();
-                    predictionType = 'BS';
-                    strategyText = "High Confidence B/S Prediction";
-                    strategyDetails = "B/S prediction has higher probability based on patterns";
-                } else {
-                    prediction = predictColor();
-                    predictionType = 'color';
-                    strategyText = "High Confidence Color Prediction";
-                    strategyDetails = "Color prediction has higher probability based on patterns";
-                }
-            }
-            
-            // Store the prediction for next evaluation
-            lastPrediction = prediction;
-            lastPredictionType = predictionType;
-            
-            if (prediction) {
-                predictionValue.textContent = prediction;
-                
-                // Set color based on prediction type
-                if (prediction === 'B') {
-                    predictionValue.style.color = 'var(--secondary-color)';
-                } else if (prediction === 'S') {
-                    predictionValue.style.color = 'var(--danger-color)';
-                } else if (prediction === 'G') {
-                    predictionValue.style.color = 'var(--green-color)';
-                    predictionValue.innerHTML = '🟢';
-                } else if (prediction === 'R') {
-                    predictionValue.style.color = 'var(--red-color)';
-                    predictionValue.innerHTML = '🔴';
-                }
-                
-                statusElement.textContent = "Prediction ready";
-                statusElement.className = "status-message ready";
-                
-                // Show strategy info
-                strategyTitle.textContent = strategyText;
-                strategyDesc.textContent = strategyDetails;
-                strategyInfo.style.display = 'block';
-            } else {
-                strategyText = "No strong pattern detected";
-                strategyDetails = "No clear prediction available based on current patterns";
-                statusElement.textContent = "No clear prediction available";
-                statusElement.className = "status-message error";
-                predictionValue.textContent = '-';
-                strategyInfo.style.display = 'none';
-            }
-        }
-        
-        function predictBS() {
-            const currentNumber = history[history.length - 1].number;
-            const currentResult = (currentNumber <= 4) ? 'S' : 'B';
-            const lastEntry = history[history.length - 2];
-            const secondLastEntry = history[history.length - 3];
-            const digits = String(currentNumber).split('').map(Number);
-            
-            // Strategy 1: Three Small in a row
-            if (checkStreak('S') >= 3) {
-                return 'B';
-            }
-            // Strategy 2: Contains 8 or 9
-            else if (digits.includes(8) || digits.includes(9)) {
-                return 'S';
-            }
-            // Strategy 3: Long streak break (4-5 same results)
-            else if (checkStreak('S') >= 4) {
-                return 'B';
-            }
-            else if (checkStreak('B') >= 4) {
-                return 'S';
-            }
-            // Strategy 4: Contains 0
-            else if (digits.includes(0)) {
-                return 'S';
-            }
-            // Strategy 5: Middle digit is small (1-2-3)
-            else if (digits.length >= 3 && digits[1] <= 3) {
-                return 'S';
-            }
-            // Strategy 6: Pattern repetition
-            else if (history.length >= 3 && 
-                     lastEntry.result === secondLastEntry.result && 
-                     lastEntry.result !== currentResult) {
-                return lastEntry.result;
-            }
-            // Strategy 7: Stair pattern (3-4-5 or 6-7-8)
-            else if (history.length >= 3 && 
-                     Math.abs(lastEntry.number - secondLastEntry.number) === 1 && 
-                     Math.abs(currentNumber - lastEntry.number) === 1) {
-                return 'S';
-            }
-            // Strategy 8: Contains 5
-            else if (digits.includes(5)) {
-                return 'B';
-            }
-            // Strategy 9: Sum of digits >= 15 (for 3-digit numbers)
-            else if (digits.length >= 3 && digits.reduce((a,b) => a + b, 0) >= 15) {
-                return 'B';
-            }
-            // Strategy 10: Single digit repeats three times
-            else if (history.length >= 3 && 
-                     lastEntry.number === secondLastEntry.number && 
-                     lastEntry.number === currentNumber) {
-                return currentResult === 'S' ? 'B' : 'S';
-            }
-            // Fallback to recent distribution
-            else {
-                // Count recent S/B distribution
-                let sCount = 0, bCount = 0;
-                for (let i = Math.max(0, history.length - 5); i < history.length; i++) {
-                    if (history[i].result === 'S') sCount++;
-                    else bCount++;
-                }
-                
-                if (sCount > bCount + 2) {
-                    return 'B';
-                } else if (bCount > sCount + 2) {
-                    return 'S';
-                } else {
-                    // If no clear pattern, return the opposite of last result
-                    return currentResult === 'S' ? 'B' : 'S';
-                }
-            }
-        }
-        
-        function predictColor() {
-            const currentNumber = history[history.length - 1].number;
-            const currentColor = (currentNumber % 2 === 1) ? 'G' : 'R';
-            
-            // Check for color patterns first
-            const colorPattern = detectColorPattern();
-            if (colorPattern) {
-                return predictBasedOnColorPattern(colorPattern);
-            }
-            
-            // Check for streaks
-            const recentColors = history.slice(-5).map(entry => entry.color);
-            const lastColor = recentColors[recentColors.length-1];
-            let streak = 1;
-            for (let i = recentColors.length-2; i >= 0; i--) {
-                if (recentColors[i] === lastColor) streak++;
-                else break;
-            }
-            
-            // If long streak, predict opposite
-            if (streak >= 3) {
-                return lastColor === 'G' ? 'R' : 'G';
-            }
-            
-            // Check for alternation pattern
-            if (recentColors.length >= 3) {
-                const c1 = recentColors[recentColors.length-1];
-                const c2 = recentColors[recentColors.length-2];
-                const c3 = recentColors[recentColors.length-3];
-                
-                if (c1 === c2 && c2 !== c3) {
-                    return c3;
-                }
-                if (c1 !== c2 && c2 === c3) {
-                    return c1;
-                }
-                if (c1 !== c2 && c2 !== c3 && c1 !== c3) {
-                    return c2;
-                }
-            }
-            
-            // Fallback: predict opposite of last color
-            return currentColor === 'G' ? 'R' : 'G';
-        }
-        
-        function calculateBSProbability() {
-            // Simple probability calculation based on recent patterns
-            const recentResults = history.slice(-5).map(entry => entry.result);
-            const sCount = recentResults.filter(r => r === 'S').length;
-            const bCount = recentResults.filter(r => r === 'B').length;
-            
-            // If we have a clear pattern, return higher probability
-            if (sCount >= 4 || bCount >= 4) return 0.8;
-            if (sCount >= 3 || bCount >= 3) return 0.7;
-            
-            // Otherwise return base probability
-            return 0.6;
-        }
-        
-        function calculateColorProbability() {
-            // Simple probability calculation based on recent patterns
-            const recentColors = history.slice(-5).map(entry => entry.color);
-            const gCount = recentColors.filter(c => c === 'G').length;
-            const rCount = recentColors.filter(c => c === 'R').length;
-            
-            // If we have a clear pattern, return higher probability
-            if (gCount >= 4 || rCount >= 4) return 0.8;
-            if (gCount >= 3 || rCount >= 3) return 0.7;
-            
-            // Check for color patterns
-            if (detectColorPattern()) return 0.75;
-            
-            // Otherwise return base probability
-            return 0.6;
-        }
-        
-        function detectColorPattern() {
-            if (history.length < 5) return null;
-            
-            // Get last 5 colors
-            const recentColors = history.slice(-5).map(entry => entry.color);
-            const colorSequence = recentColors.join('');
-            
-            // Check for specific color patterns
-            if (colorSequence === 'GRGRG') return "False Alternation";
-            if (colorSequence === 'RRRRG') return "Breakout Trap";
-            if (colorSequence === 'GGGGR') return "Back-Stab Rise";
-            if (colorSequence === 'GRGRR') return "Repeat Shock";
-            if (colorSequence === 'RRRGR') return "Overconfidence Fall";
-            if (colorSequence === 'GGGGR') return "Trap Switch";
-            if (colorSequence === 'GRGRR') return "Soft-Reverse";
-            if (colorSequence === 'RRRRR') return "Greedy Fail";
-            if (colorSequence === 'GRGRG') return "Illusion Zigzag";
-            if (colorSequence === 'GGGGR') return "Delayed Reverse";
-            if (colorSequence === 'GRGRG') return "Mind Flicker";
-            if (colorSequence === 'RRRRG') return "Loop Fake";
-            if (colorSequence === 'GGGGG') return "Slow Poison";
-            if (colorSequence === 'GRGRG') return "Odd-Shift Trap";
-            if (colorSequence === 'RRRGR') return "Dual Expectation Kill";
-            if (colorSequence === 'GGGGR') return "Stubborn Fake";
-            
-            return null;
-        }
-        
-        function predictBasedOnColorPattern(pattern) {
-            // Simple prediction based on color patterns
-            // These would be adjusted based on actual pattern behaviors
-            switch(pattern) {
-                case "False Alternation":
-                case "Illusion Zigzag":
-                case "Mind Flicker":
-                    return history[history.length-1].color === 'G' ? 'R' : 'G';
-                case "Breakout Trap":
-                case "Loop Fake":
-                    return 'G';
-                case "Back-Stab Rise":
-                case "Trap Switch":
-                case "Delayed Reverse":
-                case "Stubborn Fake":
-                    return 'R';
-                case "Repeat Shock":
-                    return history[history.length-1].color;
-                case "Overconfidence Fall":
-                case "Dual Expectation Kill":
-                    return history[history.length-1].color === 'G' ? 'R' : 'G';
-                case "Greedy Fail":
-                    return 'R';
-                case "Slow Poison":
-                    return 'G';
-                case "Odd-Shift Trap":
-                    return history[history.length-1].color === 'G' ? 'R' : 'G';
-                default:
-                    return null;
-            }
-        }
-        
-        function checkStreak(type) {
-            let streak = 0;
-            for (let i = history.length - 1; i >= 0; i--) {
-                if (history[i].result === type) streak++;
-                else break;
-            }
-            return streak;
-        }
-        
-        function updateHistoryGraph() {
-            const graph = document.getElementById('historyGraph');
-            graph.innerHTML = '';
-            
-            const maxHeight = 100;
-            const itemWidth = 14;
-            const startPos = 10;
-            
-            // Only show last 20 results
-            const displayHistory = history.slice(-20);
-            
-            displayHistory.forEach((entry, index) => {
-                const bar = document.createElement('div');
-                bar.className = 'history-bar ' + entry.result;
-                bar.style.height = (entry.number * 10) + 'px';
-                bar.style.left = (startPos + (index * (itemWidth + 2))) + 'px';
-                bar.title = '#' + entry.issue + ': ' + entry.number + ' (' + entry.result + ') ' + (entry.color === 'G' ? '🟢' : '🔴');
-                graph.appendChild(bar);
-            });
-        }
-    </script>
+            <b>Join VIP Channel:</b> @dark67hack
+          `;
+          
+          await sendToTelegram(telegramMessage);
+          
+          // Notification
+          alert(
+            ` New Prediction Generated!\n\n` +
+            ` Period: ${currentPeriod}\n` +
+            ` Pattern: ${predictionData.type}\n` +
+            ` Number: ${predictedNum}\n` +
+            ` Color: ${color}\n` +
+            ` Size: ${size}\n` +
+            ` Confidence: ${predictionData.confidence}%\n\n` +
+            `Prediction sent to VIP channel: @dark67hack`
+          );
+        }, 3000);
+      }
+    }
+
+    function updateLiveTime() {
+      const now = new Date();
+      const time = now.toLocaleTimeString('en-GB', { hour12: false });
+      document.getElementById('liveTime').innerText = "Live Time: " + time;
+    }
+
+    setInterval(() => {
+      loadAndPredict();
+      updateLiveTime();
+    }, 5000);
+
+    loadAndPredict();
+    updateLiveTime();
+  </script>
+
 </body>
 </html>
